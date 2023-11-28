@@ -1,0 +1,601 @@
+openapi: 3.0.0
+info:
+  title: WASAPhoto
+  description: |
+    OpenAPI document for the WASAPhoto application
+  version: 1.0.0
+paths:
+  /session:
+    post:
+      tags: ["login"]
+      summary: Logs in the user
+      description: |
+        If the user does not exist, it will be created, and an identifier is returned.
+        If the user exist the user identifier is returned.
+      operationId: doLogin
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LoginRequest" } # Dovrai creare uno schema per la richiesta di login e il risultato (più comodo)
+        required: true
+      responses:
+        "200":
+          description: User log-in action successful
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LoginToken" }
+        "201":
+          description: User created and log-in action successful
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LoginToken" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /users/:
+    get:
+      summary: Search users
+      description: |
+        Search a users by their username
+      tags: ["users"]
+      operationId: searchUser
+      parameters:
+        - name: username
+          in: query
+          required: true
+          schema: { $ref: "#/components/schemas/Username" }
+      responses:
+        "200":
+          description: A list of users matching the username searched
+          content:
+            application/json:
+              schema: { $ref: "#/components/responses/PageUsersResult" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /users/{idUser}/:
+    parameters:
+        - $ref: "#/components/parameters/idUser"
+    get:
+      tags: ["users"]
+      summary: Get the user's profile
+      description: Return the profile of a user
+      operationId: getUserProfile
+      responses:
+        "200":
+          description: Profile returned
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserProfile" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /users/{idUser}/stream:
+    parameters:
+      - $ref: "#/components/parameters/idUser"
+    get:
+      tags: ["users"]
+      summary: Get my stream
+      description: |
+        Get my post stream. It will contains post of my followers, in reverse chronological order
+      operationId: getMyStream
+      responses:
+        "200": { $ref: "#/components/responses/PagePhotosResult" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /users/{idUser}/followers:
+    parameters:
+      - $ref: "#/components/parameters/idUser"
+    get:
+      tags: ["users"]
+      summary: List all the followers
+      operationId: listFollowers
+      description: |
+        This method allow to list all the followers of the specified user
+      responses:
+        "200": { $ref: "#/components/responses/PageUsersResult" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /users/{idUser}/followings/:
+    parameters:
+      - $ref: "#/components/parameters/idUser"
+    get:
+      summary: List following users
+      description: |
+        List all the following of a specific user
+      tags: ["users"]
+      operationId: listFollowings
+      responses:
+        "200": { $ref: "#/components/responses/PageUsersResult" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /users/{idUser}/followings/{idFollowed}:
+    parameters:
+      - $ref: "#/components/parameters/idUser"
+      - name: idFollowed
+        in: path
+        required: true
+        description: The unique ID of the user to follow
+        schema: { $ref: "#/components/parameters/idUser" }
+    put:
+      summary: Follow a user
+      description: |
+        Add the user that you want to follow into list of following
+      tags: ["users"]
+      operationId: followUser
+      responses:
+        "200":
+          description: You were already follow this user
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserFollow" }
+        "201":
+          description: You are now following this user
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserFollow" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+    delete:
+      summary: Unfollow a user
+      description: |
+        Remove a user that you want to unfollow from the list of following
+      operationId: unfollowUser
+      tags: ["users"]
+      responses:
+        "204":
+          description: You are not following this user anymore
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /users/{idUser}/edit:
+    parameters:
+      - $ref: "#/components/parameters/idUser"
+    put:
+      tags: ["users"]
+      summary: Change the username
+      description: Set a new username
+      operationId: setMyUserName
+      responses:
+        "200":
+          description: Username updated
+          content:
+            application/json:
+              schema:
+                type: string
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /users/{idUser}/banList/{idUserBlocked}:
+    parameters:
+      - $ref: "#/components/parameters/idUser"
+      - name: idUserBlocked
+        required: true
+        in: path
+        description: The unique ID of the user to block
+        schema: { $ref: "#/components/schemas/ResourceId" }
+    put:
+      tags: ["users"]
+      operationId: banUser
+      summary: Ban a user
+      description: Ban another user ( banning someone will also make him unfollow you )
+      responses:
+        "200":
+          description: User was already banned
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserBan" }
+        "201":
+          description: User banned
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserBan" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: You cannot ban yourself
+          content:
+            text/plain:
+              schema: { $ref: "#/components/schemas/Error" }
+        "500": { $ref: "#/components/responses/ServerError" }
+    delete:
+      tags: ["users"]
+      operationId: unbanUser
+      summary: Unban a user
+      description: |
+        Unban a previously banned user.
+        You are only allowed to unban users for yourself.
+      responses:
+        "204":
+          description: User unbanned or not banned in the first place.
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /posts/:
+    post:
+      tags: ["photos"]
+      summary: Upload a photo
+      operationId: uploadPhoto
+      requestBody:
+        description: The binary image file of the photo
+        content:
+          image/*:    # Accept all type of images
+            schema:
+              type: string
+              format: binary
+              minLength: 1
+              maxLength: 31460000 # 30 MiB
+      responses:
+        "201":
+          description: The post was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "500": { $ref: "#/components/responses/ServerError" }
+  /posts/{idPhoto}:
+    parameters:
+      - $ref: "#/components/parameters/idPhoto"
+    delete:
+      tags: ["photos"]
+      summary: Delete a photo
+      description: Delete an existing photo
+      operationId: deletePhoto
+      responses:
+        "204":
+          description: Your photo has been deleted
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "500": { $ref: "#/components/responses/ServerError" }
+  /posts/{idPhoto}/comments/:
+    parameters:
+      - $ref: "#/components/parameters/idPhoto"
+    post:
+      tags: ["photos"]
+      summary: Post a comment
+      operationId: commentPhoto
+      responses:
+        "200":
+          description: Comment posted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Comment" }
+  /posts/{idPhoto}/comments/{idComment}:
+    parameters:
+      - $ref: "#/components/parameters/idComment"
+      - $ref: "#/components/parameters/idPhoto"
+    delete:
+      tags: ["photos"]
+      summary: Delete a comment
+      operationId: uncommentPhoto
+      responses:
+        "200":
+          description: Comment deleted
+  /posts/{idPhoto}/likes/{idUser}:
+    parameters:
+      - $ref: "#/components/parameters/idPhoto"
+      - $ref: "#/components/parameters/idUser"
+    put:
+      summary: Like a photo
+      description: The user put a like on a photo
+      operationId: likePhoto
+      tags: ["photos"]
+      responses:
+        "200":
+          description: Your like was already added
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Like" }
+        "201":
+          description: Your like was successfully added
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Like" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/ServerError" }
+    delete:
+      summary: Unlike a photo
+      description: Remove a like from a photo
+      tags: ["photos"]
+      operationId: unlikePhoto
+      responses:
+        "204":
+          description: Your like was removed
+        "404": { $ref: "#/components/responses/NotFound" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "500": { $ref: "#/components/responses/ServerError" }
+
+components:
+  schemas:
+    Post:
+      title: Post
+      description: This object represent a single post, with all the related informations
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/ResourceId"
+        image-url:
+          $ref: "#/components/schemas/ImageURL"
+        like-numbers:
+          description: Number of likes of this post
+          type: integer
+          minimum: 0
+          readOnly: true
+          example: 100
+        comment-numbers:
+          description: Number of commments of this post
+          type: integer
+          minimum: 0
+          readOnly: true
+          example: 20
+        upload-time:
+          $ref: "#/components/schemas/DateTime"
+
+    ImageURL:
+      title: ImageURL
+      description: |
+        This object represent the URL to the file image
+      type: object
+      properties:
+        url:
+          type: string
+          minLength: 10
+          maxLength: 256
+          example: https://example.com/img_0001_d123fca.webp
+
+    UserProfile:
+      title: UserProfile
+      description: |
+        This object reperesents all the info related to a user
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/ResourceId"
+        name:
+          description: User's name
+          type: string
+          pattern: "^.*?$"
+          minLength: 2
+          maxLength: 52
+          example: Andrea
+        surname:
+          description: User's surname
+          type: string
+          pattern: "^.*?$"
+          minLength: 2
+          maxLength: 52
+          example: Rossi
+        username:
+          $ref: "#/components/schemas/Username"
+        postNo:
+          description: The number of post
+          type: integer
+          minimum: 0
+          example: 200
+        followerNo:
+          description: The number of follower
+          type: integer
+          minimum: 0
+          example: 25
+        followingNo:
+          description: The number of followed
+          type: integer
+          minimum: 0
+          example: 10
+
+    Username:
+      title: Username
+      description: This object represent the user name
+      type: object
+      properties:
+        name:
+          description: The username
+          type: string
+          pattern: '^[a-zA-Z0-9_\.#$]+$'
+          minLength: 3
+          maxLength: 16
+          example: Andre$Mus0
+
+    Comment:
+      title: Comment
+      description: This object represent a comment to publish
+      type: object
+      properties:
+        userId:
+          $ref: "#/components/schemas/ResourceId"
+        comment:
+          type: string
+          pattern: 'ˆ.+$'
+          example: Wow!!!
+          minLength: 1
+          maxLength: 200
+
+    PostedComment:
+      title: PostedComment
+      description: This object represent a comment on a post
+      allOf:
+        - type: object
+          properties:
+            userId:
+              $ref: "#/components/schemas/ResourceId"
+            upload-time:
+              $ref: "#/components/schemas/DateTime"
+            authUser:
+              $ref: "#/components/schemas/UserProfile"
+        - $ref: "#/components/schemas/Comment"
+
+    Like:
+      title: Like
+      description: This schema represent a like on a photo
+      type: object
+      readOnly: true
+      properties:
+        userId:
+          $ref: "#/components/schemas/ResourceId"
+        photoId:
+          $ref: "#/components/schemas/ResourceId"
+
+    ResourceId:
+      title: ResourceId
+      description: The UID as a UUID string
+      type: object
+      readOnly: true
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+          minLength: 32
+          maxLength: 32
+          example: 550e8400-e29b-41d4-a716-446655440000
+
+    DateTime:
+      title: DateTime
+      description: This object reperesents the date and time
+      type: object
+      readOnly: true
+      properties:
+        date-time:
+          type: string
+          format: date-time
+          minLength: 20
+          maxLength: 20
+          example: 2017-07-21T17:32:28Z
+
+    Error:
+      title: Error
+      description: This object represent a generic description of an error
+      type: object
+      readOnly: true
+      properties:
+        error:
+          type: string
+          minLength: 0
+          maxLength: 200
+
+    UserBan:
+      title: UserBan
+      description: This object represent the ban of a user
+      readOnly: true
+      type: object
+      properties:
+        bannerId: { $ref: "#/components/schemas/ResourceId" } # Who has ban
+        bannedId: { $ref: "#/components/schemas/ResourceId" } # The banned
+
+    UserFollow:
+      title: UserFollow
+      description: This object represent the follow of a user
+      readOnly: true
+      type: object
+      properties:
+        followerId:  { $ref: "#/components/schemas/ResourceId" }
+        followingId:  { $ref: "#/components/schemas/ResourceId" }
+
+    PageUsers:
+      title: PageUsers
+      description: Current page of users
+      type: object
+      readOnly: true
+      properties:
+        page:
+          type: array
+          items: { $ref: "#/components/schemas/UserProfile" }
+          minItems: 0
+          maxItems: 20
+
+    PagePhotos:
+      title: PagePhotos
+      description: Current page of photos
+      type: object
+      readOnly: true
+      properties:
+        page:
+          type: array
+          items: { $ref: "#/components/schemas/Post" }
+          minItems: 0
+          maxItems: 20
+
+    LoginRequest:
+      title: LoginRequest
+      description: The username of the current user to login
+      type: object
+      properties:
+        username: { $ref: "#/components/schemas/Username" }
+
+    LoginToken:
+      title: LoginToken
+      description: Login return the ID of the current user
+      type: object
+      properties:
+        userID: { $ref: "#/components/schemas/ResourceId" }
+
+  parameters:
+    idPhoto:
+      name: idPhoto
+      in: path
+      schema:
+        $ref: "#/components/schemas/ResourceId"
+      required: true
+      description: The id of a photo
+    idUser:
+      name: idUser
+      in: path
+      schema: { $ref: "#/components/schemas/ResourceId" }
+      required: true
+      description: The id of a user
+    idComment:
+      name: idComment
+      in: path
+      description: The id of a comment
+      required: true
+      schema: { $ref: "#/components/schemas/ResourceId" }
+
+  responses:
+    BadRequest:
+      description: |
+        The request sent to the server is invalid (e.g. malformed request syntax, invalid request message framing, ...)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: |
+        The resource you are trying to access doesn't exist
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    ServerError:
+      description: The server encounter an unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    PageUsersResult:
+      description: The current page of users returned
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PageUsers" }
+    PagePhotosResult:
+      description: The current page of photos returned
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PagePhotos" }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+# Apply the security global, to all the operations
+security:
+  - bearerAuth: []
+
+
+tags:
+  - name: users
+    description: Users related operations
+  - name: photos
+    description: Photos related operations
+  - name: login
+    description: Login related operations
+
