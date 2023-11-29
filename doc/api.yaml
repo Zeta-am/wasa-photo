@@ -397,33 +397,23 @@ components:
           example: Andre$Mus0
 
     Comment:
-      title: Comment
-      description: This object represent a comment to publish
+      title: PostedComment
+      description: This object represent a comment on a post
       type: object
       properties:
         userId:
           $ref: "#/components/schemas/ResourceId"
+        upload-time:
+          $ref: "#/components/schemas/DateTime"
+        authUser:
+          $ref: "#/components/schemas/UserProfile"
         comment:
           type: string
           pattern: 'ˆ.+$'
           example: Wow!!!
           minLength: 1
           maxLength: 200
-
-    PostedComment:
-      title: PostedComment
-      description: This object represent a comment on a post
-      allOf:
-        - type: object
-          properties:
-            userId:
-              $ref: "#/components/schemas/ResourceId"
-            upload-time:
-              $ref: "#/components/schemas/DateTime"
-            authUser:
-              $ref: "#/components/schemas/UserProfile"
-        - $ref: "#/components/schemas/Comment"
-
+      
     Like:
       title: Like
       description: This schema represent a like on a photo
@@ -598,4 +588,3 @@ tags:
     description: Photos related operations
   - name: login
     description: Login related operations
-
