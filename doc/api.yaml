@@ -17,21 +17,28 @@ paths:
         description: User details
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/LoginRequest" } # Dovrai creare uno schema per la richiesta di login e il risultato (più comodo)
+            schema:
+             $ref: "#/components/schemas/LoginRequest"
         required: true
       responses:
         "200":
           description: User log-in action successful
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/LoginToken" }
+              schema:
+                $ref: "#/components/schemas/LoginToken"
         "201":
           description: User created and log-in action successful
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/LoginToken" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/ServerError" }
+              schema: 
+                $ref: "#/components/schemas/LoginToken" 
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500": 
+          $ref: "#/components/responses/ServerError"
+      security: []
+      
   /users/:
     get:
       summary: Search users
@@ -43,15 +50,15 @@ paths:
         - name: username
           in: query
           required: true
-          schema: { $ref: "#/components/schemas/Username" }
+          schema: 
+            $ref: "#/components/schemas/Username" 
       responses:
         "200":
-          description: A list of users matching the username searched
-          content:
-            application/json:
-              schema: { $ref: "#/components/responses/PageUsersResult" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/ServerError" }
+          $ref: "#/components/responses/PageUsersResult" 
+        "400":
+          $ref: "#/components/responses/BadRequest" 
+        "500":
+          $ref: "#/components/responses/ServerError" 
   /users/{idUser}/:
     parameters:
         - $ref: "#/components/parameters/idUser"
@@ -65,9 +72,12 @@ paths:
           description: Profile returned
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/UserProfile" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/ServerError" }
+              schema:
+               $ref: "#/components/schemas/UserProfile" 
+        "400":
+          $ref: "#/components/responses/BadRequest" 
+        "500":
+         $ref: "#/components/responses/ServerError" 
   /users/{idUser}/stream:
     parameters:
       - $ref: "#/components/parameters/idUser"
@@ -78,10 +88,14 @@ paths:
         Get my post stream. It will contains post of my followers, in reverse chronological order
       operationId: getMyStream
       responses:
-        "200": { $ref: "#/components/responses/PagePhotosResult" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "500": { $ref: "#/components/responses/ServerError" }
+        "200": 
+          $ref: "#/components/responses/PagePhotosResult" 
+        "400": 
+          $ref: "#/components/responses/BadRequest"
+        "404":  
+          $ref: "#/components/responses/NotFound" 
+        "500":
+          $ref: "#/components/responses/ServerError" 
   /users/{idUser}/followers:
     parameters:
       - $ref: "#/components/parameters/idUser"
@@ -92,10 +106,14 @@ paths:
       description: |
         This method allow to list all the followers of the specified user
       responses:
-        "200": { $ref: "#/components/responses/PageUsersResult" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "500": { $ref: "#/components/responses/ServerError" }
+        "200":  
+          $ref: "#/components/responses/PageUsersResult" 
+        "400": 
+          $ref: "#/components/responses/BadRequest" 
+        "404":  
+          $ref: "#/components/responses/NotFound" 
+        "500":  
+          $ref: "#/components/responses/ServerError" 
   /users/{idUser}/followings/:
     parameters:
       - $ref: "#/components/parameters/idUser"
@@ -106,18 +124,18 @@ paths:
       tags: ["users"]
       operationId: listFollowings
       responses:
-        "200": { $ref: "#/components/responses/PageUsersResult" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "500": { $ref: "#/components/responses/ServerError" }
+        "200": 
+          $ref: "#/components/responses/PageUsersResult" 
+        "400":
+          $ref: "#/components/responses/BadRequest" 
+        "404":
+          $ref: "#/components/responses/NotFound" 
+        "500":
+          $ref: "#/components/responses/ServerError" 
   /users/{idUser}/followings/{idFollowed}:
     parameters:
       - $ref: "#/components/parameters/idUser"
-      - name: idFollowed
-        in: path
-        required: true
-        description: The unique ID of the user to follow
-        schema: { $ref: "#/components/parameters/idUser" }
+      - $ref: "#/components/parameters/idFollowed"
     put:
       summary: Follow a user
       description: |
@@ -129,15 +147,20 @@ paths:
           description: You were already follow this user
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/UserFollow" }
+              schema: 
+                $ref: "#/components/schemas/UserFollow" 
         "201":
           description: You are now following this user
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/UserFollow" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "500": { $ref: "#/components/responses/ServerError" }
+              schema: 
+                $ref: "#/components/schemas/UserFollow" 
+        "400": 
+          $ref: "#/components/responses/BadRequest" 
+        "404": 
+          $ref: "#/components/responses/NotFound" 
+        "500": 
+          $ref: "#/components/responses/ServerError" 
     delete:
       summary: Unfollow a user
       description: |
@@ -147,8 +170,10 @@ paths:
       responses:
         "204":
           description: You are not following this user anymore
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/ServerError" }
+        "400":
+          $ref: "#/components/responses/BadRequest" 
+        "500":
+          $ref: "#/components/responses/ServerError" 
   /users/{idUser}/edit:
     parameters:
       - $ref: "#/components/parameters/idUser"
@@ -164,17 +189,16 @@ paths:
             application/json:
               schema:
                 type: string
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "500": { $ref: "#/components/responses/ServerError" }
+        "400":  
+          $ref: "#/components/responses/BadRequest" 
+        "404":  
+          $ref: "#/components/responses/NotFound" 
+        "500":  
+          $ref: "#/components/responses/ServerError" 
   /users/{idUser}/banList/{idUserBlocked}:
     parameters:
       - $ref: "#/components/parameters/idUser"
-      - name: idUserBlocked
-        required: true
-        in: path
-        description: The unique ID of the user to block
-        schema: { $ref: "#/components/schemas/ResourceId" }
+      - $ref: "#/components/parameters/idUserBlocked"
     put:
       tags: ["users"]
       operationId: banUser
@@ -185,20 +209,26 @@ paths:
           description: User was already banned
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/UserBan" }
+              schema: 
+                $ref: "#/components/schemas/UserBan" 
         "201":
           description: User banned
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/UserBan" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "404": { $ref: "#/components/responses/NotFound" }
+              schema: 
+                $ref: "#/components/schemas/UserBan" 
+        "400":  
+          $ref: "#/components/responses/BadRequest" 
+        "404": 
+           $ref: "#/components/responses/NotFound" 
         "409":
           description: You cannot ban yourself
           content:
             text/plain:
-              schema: { $ref: "#/components/schemas/Error" }
-        "500": { $ref: "#/components/responses/ServerError" }
+              schema: 
+                $ref: "#/components/schemas/Error" 
+        "500": 
+          $ref: "#/components/responses/ServerError" 
     delete:
       tags: ["users"]
       operationId: unbanUser
@@ -209,8 +239,10 @@ paths:
       responses:
         "204":
           description: User unbanned or not banned in the first place.
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/ServerError" }
+        "400": 
+          $ref: "#/components/responses/BadRequest" 
+        "500": 
+          $ref: "#/components/responses/ServerError" 
   /posts/:
     post:
       tags: ["photos"]
@@ -232,7 +264,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Post"
-        "500": { $ref: "#/components/responses/ServerError" }
+        "500":
+          $ref: "#/components/responses/ServerError" 
   /posts/{idPhoto}:
     parameters:
       - $ref: "#/components/parameters/idPhoto"
@@ -244,8 +277,10 @@ paths:
       responses:
         "204":
           description: Your photo has been deleted
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/ServerError" }
+        "400": 
+          $ref: "#/components/responses/BadRequest" 
+        "500": 
+           $ref: "#/components/responses/ServerError" 
   /posts/{idPhoto}/comments/:
     parameters:
       - $ref: "#/components/parameters/idPhoto"
@@ -258,7 +293,12 @@ paths:
           description: Comment posted
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Comment" }
+              schema:
+                $ref: "#/components/schemas/Comment" 
+        "400": 
+          $ref: "#/components/responses/BadRequest" 
+        "500": 
+           $ref: "#/components/responses/ServerError" 
   /posts/{idPhoto}/comments/{idComment}:
     parameters:
       - $ref: "#/components/parameters/idComment"
@@ -284,15 +324,20 @@ paths:
           description: Your like was already added
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Like" }
+              schema:
+                $ref: "#/components/schemas/Like" 
         "201":
           description: Your like was successfully added
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Like" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "500": { $ref: "#/components/responses/ServerError" }
+              schema: 
+                $ref: "#/components/schemas/Like" 
+        "400": 
+          $ref: "#/components/responses/BadRequest" 
+        "404": 
+          $ref: "#/components/responses/NotFound" 
+        "500":
+          $ref: "#/components/responses/ServerError" 
     delete:
       summary: Unlike a photo
       description: Remove a like from a photo
@@ -301,9 +346,12 @@ paths:
       responses:
         "204":
           description: Your like was removed
-        "404": { $ref: "#/components/responses/NotFound" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "500": { $ref: "#/components/responses/ServerError" }
+        "404": 
+          $ref: "#/components/responses/NotFound" 
+        "400": 
+          $ref: "#/components/responses/BadRequest" 
+        "500":
+          $ref: "#/components/responses/ServerError" 
 
 components:
   schemas:
@@ -341,7 +389,8 @@ components:
           type: string
           minLength: 10
           maxLength: 256
-          example: https://example.com/img_0001_d123fca.webp
+          pattern: '\bhttps?://\S+\.webp\b'
+          example: https://example.com/img001.webp
 
     UserProfile:
       title: UserProfile
@@ -354,14 +403,14 @@ components:
         name:
           description: User's name
           type: string
-          pattern: "^.*?$"
+          pattern: '^.*?$'
           minLength: 2
           maxLength: 52
           example: Andrea
         surname:
           description: User's surname
           type: string
-          pattern: "^.*?$"
+          pattern: '^.*?$'
           minLength: 2
           maxLength: 52
           example: Rossi
@@ -397,7 +446,7 @@ components:
           example: Andre$Mus0
 
     Comment:
-      title: PostedComment
+      title: Comment
       description: This object represent a comment on a post
       type: object
       properties:
@@ -405,8 +454,6 @@ components:
           $ref: "#/components/schemas/ResourceId"
         upload-time:
           $ref: "#/components/schemas/DateTime"
-        authUser:
-          $ref: "#/components/schemas/UserProfile"
         comment:
           type: string
           pattern: 'ˆ.+$'
@@ -460,6 +507,7 @@ components:
       properties:
         error:
           type: string
+          pattern: 'ˆ.+$'
           minLength: 0
           maxLength: 200
 
@@ -469,8 +517,10 @@ components:
       readOnly: true
       type: object
       properties:
-        bannerId: { $ref: "#/components/schemas/ResourceId" } # Who has ban
-        bannedId: { $ref: "#/components/schemas/ResourceId" } # The banned
+        bannerId: 
+          $ref: "#/components/schemas/ResourceId" # Who has ban
+        bannedId: 
+          $ref: "#/components/schemas/ResourceId" # The banned
 
     UserFollow:
       title: UserFollow
@@ -478,8 +528,10 @@ components:
       readOnly: true
       type: object
       properties:
-        followerId:  { $ref: "#/components/schemas/ResourceId" }
-        followingId:  { $ref: "#/components/schemas/ResourceId" }
+        followerId:  
+          $ref: "#/components/schemas/ResourceId" 
+        followingId: 
+          $ref: "#/components/schemas/ResourceId" 
 
     PageUsers:
       title: PageUsers
@@ -489,7 +541,8 @@ components:
       properties:
         page:
           type: array
-          items: { $ref: "#/components/schemas/UserProfile" }
+          items: 
+            $ref: "#/components/schemas/UserProfile" 
           minItems: 0
           maxItems: 20
 
@@ -501,7 +554,8 @@ components:
       properties:
         page:
           type: array
-          items: { $ref: "#/components/schemas/Post" }
+          items: 
+            $ref: "#/components/schemas/Post" 
           minItems: 0
           maxItems: 20
 
@@ -510,14 +564,16 @@ components:
       description: The username of the current user to login
       type: object
       properties:
-        username: { $ref: "#/components/schemas/Username" }
+        username: 
+          $ref: "#/components/schemas/Username" 
 
     LoginToken:
       title: LoginToken
       description: Login return the ID of the current user
       type: object
       properties:
-        userID: { $ref: "#/components/schemas/ResourceId" }
+        userID:  
+          $ref: "#/components/schemas/ResourceId" 
 
   parameters:
     idPhoto:
@@ -530,7 +586,8 @@ components:
     idUser:
       name: idUser
       in: path
-      schema: { $ref: "#/components/schemas/ResourceId" }
+      schema: 
+        $ref: "#/components/schemas/ResourceId" 
       required: true
       description: The id of a user
     idComment:
@@ -538,7 +595,22 @@ components:
       in: path
       description: The id of a comment
       required: true
-      schema: { $ref: "#/components/schemas/ResourceId" }
+      schema: 
+        $ref: "#/components/schemas/ResourceId" 
+    idFollowed:
+      name: idFollowed
+      in: path
+      description: The id of a user to follow
+      required: true
+      schema: 
+        $ref: "#/components/schemas/ResourceId" 
+    idUserBlocked:
+      name: idUserBlocked
+      in: path
+      description: The id of a user to block
+      required: true
+      schema:  
+        $ref: "#/components/schemas/ResourceId" 
 
   responses:
     BadRequest:
@@ -553,7 +625,8 @@ components:
         The resource you are trying to access doesn't exist
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/Error" }
+          schema: 
+            $ref: "#/components/schemas/Error" 
     ServerError:
       description: The server encounter an unexpected error
       content:
@@ -564,12 +637,14 @@ components:
       description: The current page of users returned
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/PageUsers" }
+          schema: 
+            $ref: "#/components/schemas/PageUsers" 
     PagePhotosResult:
       description: The current page of photos returned
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/PagePhotos" }
+          schema:
+            $ref: "#/components/schemas/PagePhotos" 
 
   securitySchemes:
     bearerAuth:
