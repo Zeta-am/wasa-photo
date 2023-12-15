@@ -3,7 +3,7 @@ info:
   title: WASAPhoto
   description: |
     OpenAPI document for the WASAPhoto application
-  version: 1.0.0
+  version: 1.0.1
 paths:
   /session:
     post:
@@ -18,7 +18,11 @@ paths:
         content:
           application/json:
             schema:
-             $ref: "#/components/schemas/LoginRequest"
+              description: The username of the current user to login
+              type: object
+              properties:
+                request:
+                  $ref: "#/components/schemas/LoginRequest"
         required: true
       responses:
         "200":
@@ -26,19 +30,26 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LoginToken"
+                description: Login return the UUID of the current user
+                type: object
+                properties:
+                  token:
+                    $ref: "#/components/schemas/LoginToken"
         "201":
           description: User created and log-in action successful
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/LoginToken" 
+              schema:
+                description: Login return the UUID of the current user
+                type: object
+                properties:
+                  token:
+                    $ref: "#/components/schemas/LoginToken" 
         "400":
           $ref: "#/components/responses/BadRequest"
         "500": 
           $ref: "#/components/responses/ServerError"
-      security: []
-      
+      security: []     
   /users/:
     get:
       summary: Search users
@@ -50,7 +61,7 @@ paths:
         - name: username
           in: query
           required: true
-          schema: 
+          schema:
             $ref: "#/components/schemas/Username" 
       responses:
         "200":
@@ -73,7 +84,11 @@ paths:
           content:
             application/json:
               schema:
-               $ref: "#/components/schemas/UserProfile" 
+                description: The profile of the user
+                type: object
+                properties:
+                  userProf:
+                    $ref: "#/components/schemas/UserProfile" 
         "400":
           $ref: "#/components/responses/BadRequest" 
         "500":
@@ -147,14 +162,22 @@ paths:
           description: You were already follow this user
           content:
             application/json:
-              schema: 
-                $ref: "#/components/schemas/UserFollow" 
+              schema:
+                description: The follow of the user
+                type: object
+                properties:
+                  userFollow:
+                    $ref: "#/components/schemas/UserFollow" 
         "201":
           description: You are now following this user
           content:
             application/json:
               schema: 
-                $ref: "#/components/schemas/UserFollow" 
+                description: The follow of the user
+                type: object
+                properties:
+                  userFollow:
+                    $ref: "#/components/schemas/UserFollow" 
         "400": 
           $ref: "#/components/responses/BadRequest" 
         "404": 
@@ -182,13 +205,28 @@ paths:
       summary: Change the username
       description: Set a new username
       operationId: setMyUserName
+      requestBody:
+        description: The new username
+        content:
+          application/json:
+            schema:
+              description: The new username
+              type: object
+              properties:
+                username:
+                  $ref: "#/components/schemas/Username"
+        required: true
       responses:
         "200":
           description: Username updated
           content:
             application/json:
               schema:
-                type: string
+                description: The new username
+                type: object
+                properties:
+                  username:
+                    $ref: "#/components/schemas/Username"
         "400":  
           $ref: "#/components/responses/BadRequest" 
         "404":  
@@ -210,13 +248,21 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: "#/components/schemas/UserBan" 
+                description: The ban of the user
+                type: object
+                properties:
+                  userBan:
+                    $ref: "#/components/schemas/UserBan"
         "201":
           description: User banned
           content:
             application/json:
               schema: 
-                $ref: "#/components/schemas/UserBan" 
+                description: The ban of the user
+                type: object
+                properties:
+                  userBan:
+                    $ref: "#/components/schemas/UserBan" 
         "400":  
           $ref: "#/components/responses/BadRequest" 
         "404": 
@@ -225,8 +271,12 @@ paths:
           description: You cannot ban yourself
           content:
             text/plain:
-              schema: 
-                $ref: "#/components/schemas/Error" 
+              schema:
+                description: The error message
+                type: object
+                properties:
+                  err:
+                    $ref: "#/components/schemas/Error" 
         "500": 
           $ref: "#/components/responses/ServerError" 
     delete:
@@ -253,17 +303,25 @@ paths:
         content:
           image/*:    # Accept all type of images
             schema:
-              type: string
-              format: binary
-              minLength: 1
-              maxLength: 31460000 # 30 MiB
+              description: The binary image file of the photo
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+                  minLength: 1
+                  maxLength: 31460000 # 30 MiB
       responses:
         "201":
           description: The post was created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Post"
+                description: The post created
+                type: object
+                properties:
+                  post:
+                    $ref: "#/components/schemas/Post"
         "500":
           $ref: "#/components/responses/ServerError" 
   /posts/{idPhoto}:
@@ -294,7 +352,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Comment" 
+                description: The comment posted
+                type: object
+                properties:
+                  comment:
+                    $ref: "#/components/schemas/Comment" 
         "400": 
           $ref: "#/components/responses/BadRequest" 
         "500": 
@@ -325,13 +387,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Like" 
+                description: The like
+                type: object
+                properties:
+                  like:
+                    $ref: "#/components/schemas/Like" 
         "201":
           description: Your like was successfully added
           content:
             application/json:
               schema: 
-                $ref: "#/components/schemas/Like" 
+                description: The like
+                type: object
+                properties:
+                  like:
+                    $ref: "#/components/schemas/Like" 
         "400": 
           $ref: "#/components/responses/BadRequest" 
         "404": 
@@ -456,7 +526,7 @@ components:
           $ref: "#/components/schemas/DateTime"
         comment:
           type: string
-          pattern: 'ˆ.+$'
+          pattern: 'ˆ\S+$'
           example: Wow!!!
           minLength: 1
           maxLength: 200
@@ -507,7 +577,8 @@ components:
       properties:
         error:
           type: string
-          pattern: 'ˆ.+$'
+          pattern: 'ˆ\S.+$'
+          example: The username is already taken
           minLength: 0
           maxLength: 200
 
@@ -619,32 +690,47 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Error"
+            type: object
+            properties:
+              err:
+                $ref: "#/components/schemas/Error"
     NotFound:
       description: |
         The resource you are trying to access doesn't exist
       content:
         application/json:
           schema: 
-            $ref: "#/components/schemas/Error" 
+            type: object
+            properties:
+              err:
+                $ref: "#/components/schemas/Error"
     ServerError:
       description: The server encounter an unexpected error
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Error"
+            type: object
+            properties:
+              err:
+                $ref: "#/components/schemas/Error"
     PageUsersResult:
       description: The current page of users returned
       content:
         application/json:
           schema: 
-            $ref: "#/components/schemas/PageUsers" 
+            type: object
+            properties:
+              usersPage:
+                $ref: "#/components/schemas/PageUsers" 
     PagePhotosResult:
       description: The current page of photos returned
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/PagePhotos" 
+            type: object
+            properties:
+              photosPage:
+                $ref: "#/components/schemas/PagePhotos" 
 
   securitySchemes:
     bearerAuth:
