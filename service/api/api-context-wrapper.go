@@ -1,7 +1,7 @@
 package api
 
 import (
-	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/api/reqcontext"
+	"github.com/Zeta-am/wasa-photo/service/api/reqcontext"
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
@@ -30,6 +30,8 @@ func (rt *_router) wrap(fn httpRouterHandler) func(http.ResponseWriter, *http.Re
 			"reqid":     ctx.ReqUUID.String(),
 			"remote-ip": r.RemoteAddr,
 		})
+
+		// TODO: Add controls for authorized users
 
 		// Call the next handler in chain (usually, the handler function for the path)
 		fn(w, r, ps, ctx)
