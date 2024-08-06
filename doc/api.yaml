@@ -3,7 +3,7 @@ info:
   title: WASAPhoto
   description: |
     OpenAPI document for the WASAPhoto application
-  version: 1.0.1
+  version: 1.0.2  
 paths:   
   /users/:
     post:
@@ -22,17 +22,19 @@ paths:
               type: object
               properties:
                 request:
-                  $ref: "#/components/schemas/LoginRequest"
+                  $ref: "#/components/schemas/Username"
         required: true
       responses:
         "200":
           $ref: "#/components/responses/OK"
         "201":
           $ref: "#/components/responses/Created"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "500": 
-          $ref: "#/components/responses/InternalServerError"
+        "400": 
+          $ref: '#/components/responses/BadRequest'
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
       security: [] 
   /users/{idUser} :
     parameters:
@@ -44,19 +46,15 @@ paths:
       operationId: getUserProfile
       responses:
         "200":
-          description: Profile returned
-          content:
-            application/json:
-              schema:
-                description: The profile of the user
-                type: object
-                properties:
-                  userProf:
-                    $ref: "#/components/schemas/UserProfile" 
-        "400":
-          $ref: "#/components/responses/BadRequest" 
+          $ref: "#/components/responses/OK"
+        "400": 
+          $ref: '#/components/responses/BadRequest'
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
         "500":
-         $ref: "#/components/responses/InternalServerError" 
+          $ref: '#/components/responses/InternalServerError'
   /users/{idUser}/stream:
     parameters:
       - $ref: "#/components/parameters/idUser"
@@ -70,16 +68,18 @@ paths:
         "200": 
           $ref: "#/components/responses/OK" 
         "400": 
-          $ref: "#/components/responses/BadRequest"
-        "404":  
-          $ref: "#/components/responses/NotFound" 
+          $ref: '#/components/responses/BadRequest'
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: '#/components/responses/InternalServerError'
   /users/{idUser}/followers:
     parameters:
       - $ref: "#/components/parameters/idUser"
     get:
-      tags: ["users"]
+      tags: ["follows"]
       summary: List all the followers
       operationId: listFollowers
       description: |
@@ -88,11 +88,13 @@ paths:
         "200":  
           $ref: "#/components/responses/OK" 
         "400": 
-          $ref: "#/components/responses/BadRequest" 
-        "404":  
-          $ref: "#/components/responses/NotFound" 
-        "500":  
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: '#/components/responses/BadRequest'
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
   /users/{idUser}/followings/:
     parameters:
       - $ref: "#/components/parameters/idUser"
@@ -100,17 +102,19 @@ paths:
       summary: List following users
       description: |
         List all the following of a specific user
-      tags: ["users"]
+      tags: ["follows"]
       operationId: listFollowings
       responses:
         "200": 
           $ref: "#/components/responses/OK" 
-        "400":
-          $ref: "#/components/responses/BadRequest" 
+        "400": 
+          $ref: '#/components/responses/BadRequest'
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
         "404":
-          $ref: "#/components/responses/NotFound" 
+          $ref: '#/components/responses/NotFound'
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: '#/components/responses/InternalServerError'
   /users/{idUser}/followings/{idFollowed}:
     parameters:
       - $ref: "#/components/parameters/idUser"
@@ -119,48 +123,38 @@ paths:
       summary: Follow a user
       description: |
         Add the user that you want to follow into list of following
-      tags: ["users"]
+      tags: ["follows"]
       operationId: followUser
       responses:
         "200":
-          description: You were already follow this user
-          content:
-            application/json:
-              schema:
-                description: The follow of the user
-                type: object
-                properties:
-                  userFollow:
-                    $ref: "#/components/schemas/UserFollow" 
+          $ref: "#/components/responses/OK" 
         "201":
-          description: You are now following this user
-          content:
-            application/json:
-              schema: 
-                description: The follow of the user
-                type: object
-                properties:
-                  userFollow:
-                    $ref: "#/components/schemas/UserFollow" 
+          $ref: "#/components/responses/Created" 
         "400": 
-          $ref: "#/components/responses/BadRequest" 
-        "404": 
-          $ref: "#/components/responses/NotFound" 
-        "500": 
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: '#/components/responses/BadRequest'
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
     delete:
       summary: Unfollow a user
       description: |
         Remove a user that you want to unfollow from the list of following
       operationId: unfollowUser
-      tags: ["users"]
+      tags: ["follows"]
       responses:
         "204":
           description: You are not following this user anymore
-        "400":
-          $ref: "#/components/responses/BadRequest" 
+        "400": 
+          $ref: '#/components/responses/BadRequest'
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: '#/components/responses/InternalServerError'
   /users/{idUser}/edit:
     parameters:
       - $ref: "#/components/parameters/idUser"
@@ -191,36 +185,40 @@ paths:
                 properties:
                   username:
                     $ref: "#/components/schemas/Username"
-        "400":  
-          $ref: "#/components/responses/BadRequest" 
-        "404":  
-          $ref: "#/components/responses/NotFound" 
-        "500":  
-          $ref: "#/components/responses/InternalServerError" 
+        "400": 
+          $ref: '#/components/responses/BadRequest'
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
   /users/{idUser}/banList/:
     parameters:
       - $ref: "#/components/parameters/idUser"
     
     get:
-      tags: ["users"]
+      tags: ["bans"]
       operationId: getBannedList
       summary: Gets the list of user banned
       description: Gets the list of all users banned by the user idUser
       responses:
         "200":
           $ref: "#/components/responses/OK"
-        "400":  
-          $ref: "#/components/responses/BadRequest" 
-        "404": 
-           $ref: "#/components/responses/NotFound" 
-        "500": 
-          $ref: "#/components/responses/InternalServerError"
+        "400": 
+          $ref: '#/components/responses/BadRequest'
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
   /users/{idUser}/banList/{idUserBlocked}:
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idUserBlocked"
     put:
-      tags: ["users"]
+      tags: ["bans"]
       operationId: banUser
       summary: Ban a user
       description: Ban another user ( banning someone will also make him unfollow you )
@@ -231,6 +229,8 @@ paths:
           $ref: "#/components/responses/Created"
         "400":  
           $ref: "#/components/responses/BadRequest" 
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
         "404": 
            $ref: "#/components/responses/NotFound" 
         "409":
@@ -238,7 +238,7 @@ paths:
         "500": 
           $ref: "#/components/responses/InternalServerError" 
     delete:
-      tags: ["users"]
+      tags: ["bans"]
       operationId: unbanUser
       summary: Unban a user
       description: |
@@ -249,6 +249,8 @@ paths:
           description: User unbanned or not banned in the first place.
         "400": 
           $ref: "#/components/responses/BadRequest" 
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
         "500": 
           $ref: "#/components/responses/InternalServerError" 
   /posts/:
@@ -261,14 +263,7 @@ paths:
         content:
           image/*:    # Accept all type of images
             schema:
-              description: The binary image file of the photo
-              type: object
-              properties:
-                photo:
-                  type: string
-                  format: binary
-                  minLength: 1
-                  maxLength: 31460000 # 30 MiB
+              $ref: "#/components/schemas/Image"
       responses:
         "201":
           description: The post was created
@@ -280,6 +275,10 @@ paths:
                 properties:
                   post:
                     $ref: "#/components/schemas/Post"
+        "400": 
+          $ref: '#/components/responses/BadRequest'
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
         "500":
           $ref: "#/components/responses/InternalServerError" 
   /posts/{idPhoto}:
@@ -295,13 +294,15 @@ paths:
           description: Your photo has been deleted
         "400": 
           $ref: "#/components/responses/BadRequest" 
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
         "500": 
            $ref: "#/components/responses/InternalServerError" 
   /posts/{idPhoto}/comments/:
     parameters:
       - $ref: "#/components/parameters/idPhoto"
     post:
-      tags: ["photos"]
+      tags: ["comments"]
       summary: Post a comment
       operationId: commentPhoto
       responses:
@@ -317,6 +318,8 @@ paths:
                     $ref: "#/components/schemas/Comment" 
         "400": 
           $ref: "#/components/responses/BadRequest" 
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
         "500": 
            $ref: "#/components/responses/InternalServerError" 
   /posts/{idPhoto}/comments/{idComment}:
@@ -324,13 +327,19 @@ paths:
       - $ref: "#/components/parameters/idComment"
       - $ref: "#/components/parameters/idPhoto"
     delete:
-      tags: ["photos"]
+      tags: ["comments"]
       summary: Delete a comment
       operationId: uncommentPhoto
       responses:
         "200":
-          description: Comment deleted
-  /posts/{idPhoto}/likes/{idUser}:
+          $ref: "#/components/responses/OK"
+        "400": 
+          $ref: "#/components/responses/BadRequest" 
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
+        "500": 
+           $ref: "#/components/responses/InternalServerError"
+  /posts/{idPhoto}/likes/{idUser}:    
     parameters:
       - $ref: "#/components/parameters/idPhoto"
       - $ref: "#/components/parameters/idUser"
@@ -338,7 +347,7 @@ paths:
       summary: Like a photo
       description: The user put a like on a photo
       operationId: likePhoto
-      tags: ["photos"]
+      tags: ["likes"]
       responses:
         "200":
           description: Your like was already added
@@ -362,34 +371,48 @@ paths:
                     $ref: "#/components/schemas/Like" 
         "400": 
           $ref: "#/components/responses/BadRequest" 
-        "404": 
-          $ref: "#/components/responses/NotFound" 
-        "500":
-          $ref: "#/components/responses/InternalServerError" 
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
+        "500": 
+           $ref: "#/components/responses/InternalServerError"
     delete:
       summary: Unlike a photo
       description: Remove a like from a photo
-      tags: ["photos"]
+      tags: ["likes"]
       operationId: unlikePhoto
       responses:
         "204":
           description: Your like was removed
-        "404": 
-          $ref: "#/components/responses/NotFound" 
         "400": 
           $ref: "#/components/responses/BadRequest" 
+        "404": 
+          $ref: "#/components/responses/NotFound" 
         "500":
           $ref: "#/components/responses/InternalServerError" 
 
 components:
   schemas:
+    Image:
+      title: Image
+      description: This object represents a single image (as binary of maximum size 20MB)
+      type: string
+      format: binary
+      minLength: 1
+      maxLength: 20971520
     Post:
       title: Post
       description: This object represent a single post, with all the related informations
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/ResourceId"
+          description: The ID of the post
+          type: integer
+          readOnly: true
+          example: 100
+        image:
+          $ref: "#/components/schemas/Image"
+        user-id:
+          $ref: "#/components/schemas/User/properties/id"
         like-numbers:
           description: Number of likes of this post
           type: integer
@@ -404,14 +427,17 @@ components:
           example: 20
         upload-time:
           $ref: "#/components/schemas/DateTime"
-    UserProfile:
-      title: UserProfile
+    User:
+      title: User
       description: |
         This object reperesents all the info related to a user
       type: object
       properties:
         id:
-          $ref: "#/components/schemas/ResourceId"
+          description: The ID of the user
+          type: integer
+          readOnly: true
+          example: 100
         name:
           description: User's name
           type: string
@@ -460,8 +486,15 @@ components:
       description: This object represent a comment on a post
       type: object
       properties:
+        id:
+          description: The ID of the comment
+          type: integer
+          readOnly: true
+          example: 100
         userId:
-          $ref: "#/components/schemas/ResourceId"
+          $ref: "#/components/schemas/User/properties/id"
+        photoId:
+          $ref: "#/components/schemas/Post/properties/id"
         upload-time:
           $ref: "#/components/schemas/DateTime"
         comment:
@@ -477,22 +510,9 @@ components:
       readOnly: true
       properties:
         userId:
-          $ref: "#/components/schemas/ResourceId"
+          $ref: "#/components/schemas/User/properties/id"
         photoId:
-          $ref: "#/components/schemas/ResourceId"
-    ResourceId:
-      title: ResourceId
-      description: The UID as a UUID string
-      type: object
-      readOnly: true
-      properties:
-        uuid:
-          type: string
-          format: uuid
-          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-          minLength: 32
-          maxLength: 32
-          example: 550e8400-e29b-41d4-a716-446655440000
+          $ref: "#/components/schemas/Post/properties/id"
     DateTime:
       title: DateTime
       description: This object reperesents the date and time
@@ -517,78 +537,21 @@ components:
           example: The username is already taken
           minLength: 0
           maxLength: 200
-    UserBan:
-      title: UserBan
-      description: This object represent the ban of a user
-      readOnly: true
-      type: object
-      properties:
-        bannerId: 
-          $ref: "#/components/schemas/ResourceId" # Who has ban
-        bannedId: 
-          $ref: "#/components/schemas/ResourceId" # The banned
-    UserFollow:
-      title: UserFollow
-      description: This object represent the follow of a user
-      readOnly: true
-      type: object
-      properties:
-        followerId:  
-          $ref: "#/components/schemas/ResourceId" 
-        followingId: 
-          $ref: "#/components/schemas/ResourceId" 
-    PageUsers:
-      title: PageUsers
-      description: Current page of users
-      type: object
-      readOnly: true
-      properties:
-        page:
-          type: array
-          items: 
-            $ref: "#/components/schemas/UserProfile" 
-          minItems: 0
-          maxItems: 20
-    Stream:
-      title: PagePhotos
-      description: Current page of photos
-      type: object
-      readOnly: true
-      properties:
-        page:
-          type: array
-          items: 
-            $ref: "#/components/schemas/Post" 
-          minItems: 0
-          maxItems: 20
-    LoginRequest:
-      title: LoginRequest
-      description: The username of the current user to login
-      type: object
-      properties:
-        username: 
-          $ref: "#/components/schemas/Username" 
-    LoginToken:
-      title: LoginToken
-      description: Login return the ID of the current user
-      type: object
-      properties:
-        userID:  
-          $ref: "#/components/schemas/ResourceId" 
+
 
   parameters:
     idPhoto:
       name: idPhoto
       in: path
       schema:
-        $ref: "#/components/schemas/ResourceId"
+        $ref: "#/components/schemas/Post/properties/id"
       required: true
       description: The id of a photo
     idUser:
       name: idUser
       in: path
       schema: 
-        $ref: "#/components/schemas/ResourceId" 
+        $ref: "#/components/schemas/User/properties/id" 
       required: true
       description: The id of a user
     idComment:
@@ -597,21 +560,21 @@ components:
       description: The id of a comment
       required: true
       schema: 
-        $ref: "#/components/schemas/ResourceId" 
+        $ref: "#/components/schemas/Comment/properties/id" 
     idFollowed:
       name: idFollowed
       in: path
       description: The id of a user to follow
       required: true
       schema: 
-        $ref: "#/components/schemas/ResourceId" 
+        $ref: "#/components/schemas/User/properties/id" 
     idUserBlocked:
       name: idUserBlocked
       in: path
       description: The id of a user to block
       required: true
       schema:  
-        $ref: "#/components/schemas/ResourceId" 
+        $ref: "#/components/schemas/User/properties/id" 
 
   responses:
     OK: # 200
@@ -654,6 +617,16 @@ components:
             properties:
               err:
                 $ref: "#/components/schemas/Message"
+    Unauthorized: # 401
+      description: 
+        The request was not successful because it lacks valid authentication credentials for the requested resource
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              err:
+                $ref: "#/components/schemas/Message"
     NotFound: # 404
       description: |
         The resource you are trying to access doesn't exist
@@ -664,6 +637,15 @@ components:
             properties:
               err:
                 $ref: "#/components/schemas/Message"
+    Conflict: # 409
+      description: This response is sent when a request conflicts with the current state of the server
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              err: 
+                $ref: "#/components/schemas/Message"
     InternalServerError:  #500
       description: The server encounter an unexpected error
       content:
@@ -673,16 +655,7 @@ components:
             properties:
               err:
                 $ref: "#/components/schemas/Message"
-    Conflict:
-      description: This response is sent when a request conflicts with the current state of the server
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              err: 
-                $ref: "#/components/schemas/Message"
-
+    
 
   securitySchemes:
     bearerAuth:
@@ -699,3 +672,11 @@ tags:
     description: Users related operations
   - name: photos
     description: Photos related operations
+  - name: follows
+    description: Follows related operations
+  - name: bans
+    description: Bans related operations
+  - name: comments
+    description: Comments related operations
+  - name: likes
+    description: Likes related operations

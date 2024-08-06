@@ -57,13 +57,113 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 	// Check if table exists. If not, the database is empty, and we need to create the structure
 	var tableName string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
-		sqlStmt := `CREATE TABLE example_table (id INTEGER NOT NULL PRIMARY KEY, name TEXT);`
+		
+		// Activate the foreign key
+		sqlStmt := `PRAGMA foreign_key=ON`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
 			return nil, fmt.Errorf("error creating database structure: %w", err)
 		}
+
+		// Create table User
+		sqlStmt = `CREATE TABLE users (
+			user_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			username TEXT NOT NULL UNIQUE CHECK(length(username) > 2 AND length(username) < 17),
+			user_name TEXT NOT NULL,
+			user_surname TEXT NOT NULL
+		);`
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+
+		// Create table Post
+		sqlStmt = `CREATE TABLE posts(
+			post_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER NOT NULL,
+			image BLOB NOT NULL,
+			timestamp TEXT NOT NULL,
+			FOREIGN KEY(user_id) 
+				REFERENCES users(user_id)
+					ON DELETE CASCADE
+		);` 
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+
+		// Create table Comment
+		sqlStmt = `CREATE TABLE comments(
+			comm_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER NOT NULL,
+			post_id INTEGER NOT NULL,
+			timestamp TEXT NOT NULL,
+			caption TEXT NOT NULL,
+			FOREIGN KEY(user_id) 
+				REFERENCES users(user_id)
+					ON DELETE CASCADE
+			FOREIGN KEY(post_id) 
+				REFERENCES posts(post_id)
+					ON DELETE CASCADE
+		);`
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+
+		// Create table Like
+		sqlStmt = `CREATE TABLE likes(
+			user_id INTEGER NOT NULL,
+			post_id INTEGER NOT NULL,
+			PRIMARY KEY(user_id, post_id),
+			FOREIGN KEY(user_id)
+				REFERENCES users(user_id)
+					ON DELETE CASCADE
+			FOREIGN KEY(post_id)
+				REFERENCES post(post_id)
+					ON DELETE CASCADE
+		);` 
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+
+		// Create table Follows
+		sqlStmt = `CREATE TABLE follows(
+			user_id INTEGER NOT NULL, 
+			followed_id INTEGER NOT NULL,
+			PRIMARY KEY(user_id, followed_id),
+			FOREIGN KEY(user_id)
+				REFERENCES users(user_id)
+					ON DELETE CASCADE
+			FOREIGN KEY(followed_id)
+				REFERENCES users(user_id)
+					ON DELETE CASCADE
+		);`
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+
+		// Create table Bans
+		sqlStmt = `CREATE TABLE bans(
+			user_id INTEGER NOT NULL,
+			banned_id INTEGER NOT NULL,
+			PRIMARY KEY(user_id, banned_id),
+			FOREIGN KEY(user_id)
+				REFERENCES users(user_id)
+					ON DELETE CASCADE
+			FOREIGN KEY(banned_id)
+				REFERENCES users(user_id)
+					ON DELETE CASCADE
+		);`
+		_, err = db.Exec(sqlStmt)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+
 	}
 
 	return &appdbimpl{
