@@ -6,6 +6,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"github.com/Zeta-am/wasa-photo/service/utils"
 )
 
 // httpRouterHandler is the signature for functions that accepts a reqcontext.RequestContext in addition to those
@@ -13,26 +14,37 @@ import (
 type httpRouterHandler func(http.ResponseWriter, *http.Request, httprouter.Params, reqcontext.RequestContext)
 
 // wrap parses the request and adds a reqcontext.RequestContext instance related to the request.
-func (rt *_router) wrap(fn httpRouterHandler) func(http.ResponseWriter, *http.Request, httprouter.Params) {
+func (rt *_router) wrap(fn httpRouterHandler, auth bool) func(http.ResponseWriter, *http.Request, httprouter.Params) {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		reqUUID, err := uuid.NewV4()
+		uid := 0
 		if err != nil {
 			rt.baseLogger.WithError(err).Error("can't generate a request UUID")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		// Check if the user is authorized
+		if auth {
+			uid, err = utils.GetAuthorization(w, r)
+			if err != nil {
+				rt.baseLogger.WithError(utils.ErrUnauthorized)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if uid == 0 {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+		}
 		var ctx = reqcontext.RequestContext{
 			ReqUUID: reqUUID,
+			UserID: uid,
 		}
-
 		// Create a request-specific logger
 		ctx.Logger = rt.baseLogger.WithFields(logrus.Fields{
 			"reqid":     ctx.ReqUUID.String(),
 			"remote-ip": r.RemoteAddr,
 		})
-
-		// TODO: Add controls for authorized users
-
 		// Call the next handler in chain (usually, the handler function for the path)
 		fn(w, r, ps, ctx)
 	}
