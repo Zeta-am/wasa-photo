@@ -21,3 +21,10 @@ func (db *appdbimpl) IsUsernameExists(username string) (bool, error) {
 	}
 	return usern != "", err
 }
+
+func (db *appdbimpl) CreateUser(u utils.User) (utils.User, error) {
+	var user utils.User
+	user.Username = u.Username
+	err := db.c.QueryRow("INSERT INTO users (user_id, username) VALUES (?, ?);").Scan(&user.UserID)
+	return user, err
+}

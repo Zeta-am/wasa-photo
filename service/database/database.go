@@ -34,12 +34,26 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+
+	"github.com/Zeta-am/wasa-photo/service/utils"
 )
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	//GetName() (string, error)
-	//SetName(name string) error
+	/* User */
+	GetUserByName(username string) (utils.User, error)
+	IsUsernameExists(username string) (bool, error)
+	CreateUser(u utils.User) (utils.User, error)
+
+	/* Post */
+
+	/* Comment */
+
+	/* Like */
+
+	/* Follow */
+
+	/* Ban */
 
 	Ping() error
 }
@@ -68,7 +82,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 
 		// Create table User
-		sqlStmt = `CREATE TABLE users (
+		sqlStmt = `CREATE TABLE IF NOT EXISTS users (
 			user_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			username TEXT NOT NULL UNIQUE CHECK(length(username) > 2 AND length(username) < 17),
 			user_name TEXT NOT NULL,
@@ -80,7 +94,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 
 		// Create table Post
-		sqlStmt = `CREATE TABLE posts(
+		sqlStmt = `CREATE TABLE IF NOT EXISTS posts(
 			post_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			user_id INTEGER NOT NULL,
 			image BLOB NOT NULL,
@@ -95,7 +109,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 
 		// Create table Comment
-		sqlStmt = `CREATE TABLE comments(
+		sqlStmt = `CREATE TABLE IF NOT EXISTS comments(
 			comm_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			user_id INTEGER NOT NULL,
 			post_id INTEGER NOT NULL,
@@ -114,7 +128,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 
 		// Create table Like
-		sqlStmt = `CREATE TABLE likes(
+		sqlStmt = `CREATE TABLE IF NOT EXISTS likes(
 			user_id INTEGER NOT NULL,
 			post_id INTEGER NOT NULL,
 			PRIMARY KEY(user_id, post_id),
@@ -131,7 +145,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 
 		// Create table Follows
-		sqlStmt = `CREATE TABLE follows(
+		sqlStmt = `CREATE TABLE IF NOT EXISTS follows(
 			user_id INTEGER NOT NULL, 
 			followed_id INTEGER NOT NULL,
 			PRIMARY KEY(user_id, followed_id),
@@ -148,7 +162,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		}
 
 		// Create table Bans
-		sqlStmt = `CREATE TABLE bans(
+		sqlStmt = `CREATE TABLE IF NOT EXISTS bans(
 			user_id INTEGER NOT NULL,
 			banned_id INTEGER NOT NULL,
 			PRIMARY KEY(user_id, banned_id),

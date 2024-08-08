@@ -23,7 +23,7 @@ paths:
               properties:
                 request:
                   $ref: "#/components/schemas/Username"
-        required: true
+        required: true      
       responses:
         "200":
           $ref: "#/components/responses/OK"
@@ -475,6 +475,10 @@ components:
           description: If the user is banned
           type: boolean
           example: true
+        followed:
+          description: If the user is followed
+          type: boolean
+          example: false
     Username:
       title: Username
       description: This object represent the user name

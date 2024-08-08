@@ -24,6 +24,39 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 	
-	// Check if the user exists, if not create it 
-	
+	// Check if the user exists
+	exist, err := rt.db.IsUsernameExists(user.Username)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("can't check if the user exists")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// If not exist create a new user
+	if !exist {
+		user, err = rt.db.CreateUser(user)
+		if err != nil {
+			ctx.Logger.WithError(err).Error("can't create the user")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusCreated)
+	} else {	// Else get the user from database
+		user, err = rt.db.GetUserByName(user.Username)
+		if err != nil {
+			ctx.Logger.WithError(err).Error("can't get the user from database")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+
+	// Encode the user and send it to the client 
+	w.Header().Set("Content-type", "application/json")
+	err = json.NewEncoder(w).Encode(user)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("can't encode the response")
+		w.WriteHeader(http.StatusInternalServerError)
+		return	
+	}
 }
