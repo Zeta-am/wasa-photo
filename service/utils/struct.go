@@ -10,23 +10,25 @@ type User struct {
 	PostCount      int    `json:"postNo"`
 	FollowerCount  int    `json:"followerNo"`
 	FollowingCount int    `json:"followingNo"`
+	Banned 		   bool	  `json:"banned"`
 }
 
 type Post struct {
-	PostID int `json:"id"`
-	Image string `json:"image"`
-	UserID int `json:"user-id"`
-	LikeCount int `json:"like-numbers"`
-	CommentCount int `json:"comment-numbers"`
-	Timestamp string `json:"upload-time"`
+	PostID int 			`json:"id"`
+	Image string 		`json:"image"`
+	UserID int 			`json:"user-id"`
+	LikeCount int 		`json:"like-numbers"`
+	CommentCount int 	`json:"comment-numbers"`
+	Timestamp string 	`json:"upload-time"`
+	Liked bool 			`json:"liked"`
 }
 
 type Comment struct {
-	CommentID int `json:"id"`
-	UserID int `json:"userId"`
-	PostID int `json:"photoId"`
-	Timestamp string `json:"upload-time"`
-	Description string `json:"comment"`
+	CommentID int 		`json:"id"`
+	UserID int 			`json:"userId"`
+	PostID int 			`json:"photoId"`
+	Timestamp string 	`json:"upload-time"`
+	Description string 	`json:"comment"`
 }
 
 type Like struct {

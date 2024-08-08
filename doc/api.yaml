@@ -417,16 +417,18 @@ components:
           description: Number of likes of this post
           type: integer
           minimum: 0
-          readOnly: true
           example: 100
         comment-numbers:
           description: Number of commments of this post
           type: integer
           minimum: 0
-          readOnly: true
-          example: 20
+          example: 20 
         upload-time:
           $ref: "#/components/schemas/DateTime"
+        liked:
+          description: If the post is liked
+          type: boolean
+          example: true
     User:
       title: User
       description: |
@@ -469,6 +471,10 @@ components:
           type: integer
           minimum: 0
           example: 10
+        banned:
+          description: If the user is banned
+          type: boolean
+          example: true
     Username:
       title: Username
       description: This object represent the user name
