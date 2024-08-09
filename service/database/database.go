@@ -44,7 +44,7 @@ type AppDatabase interface {
 	GetUserByName(username string) (utils.User, error)
 	IsUsernameExists(username string) (bool, error)
 	CreateUser(u utils.User) (utils.User, error)
-
+	GetUserProfile(userId int) (utils.User, error)
 	/* Post */
 
 	/* Comment */
@@ -146,7 +146,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 		// Create table Follows
 		sqlStmt = `CREATE TABLE IF NOT EXISTS follows(
-			user_id INTEGER NOT NULL, 
+			follower_id INTEGER NOT NULL, 
 			followed_id INTEGER NOT NULL,
 			PRIMARY KEY(user_id, followed_id),
 			FOREIGN KEY(user_id)

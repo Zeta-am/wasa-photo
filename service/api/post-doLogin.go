@@ -10,7 +10,9 @@ import (
 )
 
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-
+	// Set the content of the request as an application/json
+	w.Header().Set("Content-type", "application/json")
+	
 	var user utils.User
 	// Read the request body
 	err := json.NewDecoder(r.Body).Decode(&user)
@@ -52,7 +54,6 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	// Encode the user and send it to the client
-	w.Header().Set("Content-type", "application/json")
 	err = json.NewEncoder(w).Encode(user)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("can't encode the response")
