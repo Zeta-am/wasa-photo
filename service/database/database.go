@@ -73,7 +73,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 	var tableName string
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='users';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
-		
+
 		// Activate the foreign key
 		sqlStmt := `PRAGMA foreign_key=ON`
 		_, err = db.Exec(sqlStmt)
@@ -86,7 +86,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 			user_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			username TEXT NOT NULL UNIQUE CHECK(length(username) > 2 AND length(username) < 17),
 			user_name TEXT NOT NULL,
-			user_surname TEXT NOT NULL
+			user_surname TEXT NOT NULL	
 		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
@@ -102,7 +102,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 			FOREIGN KEY(user_id) 
 				REFERENCES users(user_id)
 					ON DELETE CASCADE
-		);` 
+		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
 			return nil, fmt.Errorf("error creating database structure: %w", err)
@@ -138,7 +138,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 			FOREIGN KEY(post_id)
 				REFERENCES post(post_id)
 					ON DELETE CASCADE
-		);` 
+		);`
 		_, err = db.Exec(sqlStmt)
 		if err != nil {
 			return nil, fmt.Errorf("error creating database structure: %w", err)

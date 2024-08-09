@@ -22,9 +22,16 @@ func (db *appdbimpl) IsUsernameExists(username string) (bool, error) {
 	return usern != "", err
 }
 
+
 func (db *appdbimpl) CreateUser(u utils.User) (utils.User, error) {
-	var user utils.User
-	user.Username = u.Username
-	err := db.c.QueryRow("INSERT INTO users (user_id, username) VALUES (?, ?);").Scan(&user.UserID)
-	return user, err
+	result, err := db.c.Exec("INSERT INTO users (username, user_name, user_surname) VALUES (?, ?, ?);", u.Username, u.Name, u.Surname)
+	if err != nil {
+		return utils.User{}, err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return utils.User{}, err
+	}
+	u.UserID = int(id)
+	return u, nil
 }

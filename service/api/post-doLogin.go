@@ -1,12 +1,12 @@
 package api
 
 import (
-	"encoding/json"
+	"encoding/json"	
 	"net/http"
 
 	"github.com/Zeta-am/wasa-photo/service/api/reqcontext"
-	"github.com/julienschmidt/httprouter"
 	"github.com/Zeta-am/wasa-photo/service/utils"
+	"github.com/julienschmidt/httprouter"
 )
 
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -23,7 +23,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	if !utils.HttpValidateUsername(w, user.Username) {
 		return
 	}
-	
+
 	// Check if the user exists
 	exist, err := rt.db.IsUsernameExists(user.Username)
 	if err != nil {
@@ -41,7 +41,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 			return
 		}
 		w.WriteHeader(http.StatusCreated)
-	} else {	// Else get the user from database
+	} else { // Else get the user from database
 		user, err = rt.db.GetUserByName(user.Username)
 		if err != nil {
 			ctx.Logger.WithError(err).Error("can't get the user from database")
@@ -51,12 +51,13 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		w.WriteHeader(http.StatusOK)
 	}
 
-	// Encode the user and send it to the client 
+	// Encode the user and send it to the client
 	w.Header().Set("Content-type", "application/json")
 	err = json.NewEncoder(w).Encode(user)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("can't encode the response")
 		w.WriteHeader(http.StatusInternalServerError)
-		return	
+		return
 	}
+	ctx.Logger.Info("Login successful")
 }
