@@ -4,21 +4,25 @@ import (
 	"errors"
 	"net/http"
 	"regexp"
-	"strconv"
-	"strings"
+	"strconv"	
 )
 
 func GetAuthorization(w http.ResponseWriter, r *http.Request) (int, error) {
-	auth := strings.Split(r.Header.Get("Authorization"), " ")
-	if len(auth) <= 1 {
-		return 0, ErrUnauthorized
-	}
-	// Get the header authorization value
-	uid, err := strconv.Atoi(auth[1])
+	// auth := strings.Split(r.Header.Get("Authorization"), " ")
+	// if len(auth) <= 1 {
+	// 	return 0, ErrUnauthorized
+	// }
+	// // Get the header authorization value
+	// uid, err := strconv.Atoi(auth[1])
+	// if err != nil {
+	// 	return 0, ErrUnauthorized
+	// }
+
+	auth, err := strconv.Atoi(r.Header.Get("Authorization"))
 	if err != nil {
-		return 0, ErrUnauthorized
+		return 0, nil
 	}
-	return uid, nil
+	return auth, nil	
 }
 
 func SetHeaderJson(w http.ResponseWriter) {

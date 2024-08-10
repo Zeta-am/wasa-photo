@@ -19,6 +19,18 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
+	// TODO: in ctx UserID e' il token auth, BISOGNA CONTROLLARE CHE L'ID DEL PATH SIA UGUALE A QUELLO DI UserID
+	// Check if the authorization is equal to the uid
+	// authCode, err := strconv.Atoi(w.Header().Get("Authorization"))
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusBadRequest)
+	// 	return
+	// }
+	// if authCode != ctx.UserID {
+	// 	w.WriteHeader(http.StatusUnauthorized)
+	// 	return
+	// }
+
 	// Get the user from database
 	dbUser, err := rt.db.GetUserProfile(uid)
 	if err != nil {
@@ -37,5 +49,4 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	ctx.Logger.Info("Get user")
 }

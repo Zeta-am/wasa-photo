@@ -35,7 +35,8 @@ func (rt *_router) wrap(fn httpRouterHandler, auth bool) func(http.ResponseWrite
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
 			}
-		}
+		}	
+				
 		var ctx = reqcontext.RequestContext{
 			ReqUUID: reqUUID,
 			UserID: uid,

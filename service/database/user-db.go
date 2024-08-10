@@ -13,9 +13,10 @@ func (db *appdbimpl) GetUserByName(username string) (utils.User, error) {
 							FROM users 
 							WHERE username = ?;`, username).Scan(&user.UserID, &user.Username)
 	if err != nil {
-		return user, nil
+		return user, err
 	}
-	return user, err
+
+	return user, nil
 }
 
 func (db *appdbimpl) IsUsernameExists(username string) (bool, error) {
@@ -23,11 +24,14 @@ func (db *appdbimpl) IsUsernameExists(username string) (bool, error) {
 	err := db.c.QueryRow(`SELECT username 
 							FROM users 
 							WHERE username = ?;`, username).Scan(&usern)
-	if err != nil && errors.Is(err, sql.ErrNoRows) {
-		return false, nil
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil	
+		}
+		return false, err
 	}
-	return usern != "", err
-}
+	return true, nil
+} 
 
 func (db *appdbimpl) CreateUser(u utils.User) (utils.User, error) {
 	result, err := db.c.Exec(`INSERT 
@@ -51,7 +55,7 @@ func (db *appdbimpl) GetUserProfile(userId int) (utils.User, error) {
 							FROM users 
 							WHERE user_id = ?;`, userId).Scan(&user.UserID, &user.Username, &user.Name, &user.Surname)
 	if err != nil {
-		return user, err
+		return user, err		
 	}
 
 	// Get the number of followers
@@ -61,6 +65,7 @@ func (db *appdbimpl) GetUserProfile(userId int) (utils.User, error) {
 	if err != nil {
 		return user, err
 	}
+
 	// Get the number of followed
 	err = db.c.QueryRow(`SELECT COUNT(followed_id)
 							FROM follows
