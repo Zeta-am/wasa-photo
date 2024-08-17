@@ -253,11 +253,19 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         "500": 
           $ref: "#/components/responses/InternalServerError" 
-  /posts/:
+  /users/{idUser}/posts/:
     post:
       tags: ["photos"]
       summary: Upload a photo
       operationId: uploadPhoto
+      parameters:
+        - name: caption
+          in: query
+          description: Optional description
+          required: true
+          schema:
+            $ref: "#/components/schemas/Message"
+
       requestBody:
         description: The binary image file of the photo
         content:
@@ -281,7 +289,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         "500":
           $ref: "#/components/responses/InternalServerError" 
-  /posts/{idPhoto}:
+  /users/{idUser}/posts/{idPhoto}:
     parameters:
       - $ref: "#/components/parameters/idPhoto"
     delete:
@@ -298,7 +306,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         "500": 
            $ref: "#/components/responses/InternalServerError" 
-  /posts/{idPhoto}/comments/:
+  /users/{idUser}/posts/{idPhoto}/comments/:
     parameters:
       - $ref: "#/components/parameters/idPhoto"
     post:
@@ -322,7 +330,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         "500": 
            $ref: "#/components/responses/InternalServerError" 
-  /posts/{idPhoto}/comments/{idComment}:
+  /users/{idUser}/posts/{idPhoto}/comments/{idComment}:
     parameters:
       - $ref: "#/components/parameters/idComment"
       - $ref: "#/components/parameters/idPhoto"
@@ -339,7 +347,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         "500": 
            $ref: "#/components/responses/InternalServerError"
-  /posts/{idPhoto}/likes/{idUser}:    
+  /users/{idUser}/posts/{idPhoto}/likes/{idUser}:    
     parameters:
       - $ref: "#/components/parameters/idPhoto"
       - $ref: "#/components/parameters/idUser"
@@ -643,6 +651,16 @@ components:
       content:
         application/json:
           schema: 
+            type: object
+            properties:
+              err:
+                $ref: "#/components/schemas/Message"
+    NotAcceptable:  # 406
+      description: |
+        The server is unable to provide a response that matches the client's requested format
+      content:
+        application/json:
+          schema:
             type: object
             properties:
               err:

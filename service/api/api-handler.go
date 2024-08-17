@@ -9,8 +9,11 @@ import (
 		// User
 		rt.router.POST("/users", rt.wrap(rt.doLogin, false))
 		rt.router.GET("/users/:idUser", rt.wrap(rt.getUserProfile, true))
-
+		rt.router.GET("/users/:idUser/followers", rt.wrap(rt.listFollowers, true))
+		rt.router.GET("/users/:idUser/stream", rt.wrap(rt.getMyStream, true))
+	
 		// Post 
+		rt.router.POST("/users/:idUser/posts", rt.wrap(rt.uploadPhoto, true))
 
 		// Comment 
 

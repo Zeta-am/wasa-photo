@@ -22,6 +22,7 @@ type Post struct {
 	CommentCount int 	`json:"comment-numbers"`
 	Timestamp string 	`json:"upload-time"`
 	Liked bool 			`json:"liked"`
+	Caption string		`json:"caption"`
 }
 
 type Comment struct {

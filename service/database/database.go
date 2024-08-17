@@ -47,6 +47,7 @@ type AppDatabase interface {
 	GetUserProfile(userId int) (utils.User, error)
 
 	/* Post */
+	CreatePost(p utils.Post) (utils.Post, error)
 
 	/* Comment */
 
@@ -100,6 +101,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 				user_id INTEGER NOT NULL,
 				image BLOB NOT NULL,
 				timestamp TEXT NOT NULL,
+				caption TEXT NOT NULL,
 				FOREIGN KEY(user_id) 
 					REFERENCES users(user_id)
 						ON DELETE CASCADE
