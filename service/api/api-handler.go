@@ -20,6 +20,7 @@ import (
 		// Like
 
 		// Follow
+		rt.router.PUT("/users/:idUser/followings/:idFollowed", rt.wrap(rt.followUser, true))
 
 		// Ban 
 

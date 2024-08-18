@@ -7,6 +7,10 @@ import (
 	"github.com/Zeta-am/wasa-photo/service/utils"
 )
 
+// TODO: Rivedi tutta la struttura di aggiornamento dei dati e di controllo degli errori di tutti
+// i metodi scritti	
+// func (db *appdbimpl) fillUser(user utils.User) (utils.User, int, error) 
+
 func (db *appdbimpl) GetUserByName(username string) (utils.User, error) {
 	var user utils.User
 	err := db.c.QueryRow(`SELECT user_id, username 
@@ -17,6 +21,19 @@ func (db *appdbimpl) GetUserByName(username string) (utils.User, error) {
 	}
 
 	return user, nil
+}
+
+func (db *appdbimpl) GetUserById(id int) (utils.User, int, error) {
+	var user utils.User
+
+	err := db.c.QueryRow(`SELECT user_id, username 
+							FROM users
+							WHERE user_id = ?`, id).Scan(&user.UserID, &user.Username)
+	res := checkResults(err)
+	if res != SUCCESS {
+		return utils.User{}, res, err
+	}			
+	return user, SUCCESS, nil
 }
 
 func (db *appdbimpl) IsUsernameExists(username string) (bool, error) {

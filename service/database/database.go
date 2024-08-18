@@ -45,15 +45,17 @@ type AppDatabase interface {
 	IsUsernameExists(username string) (bool, error)
 	CreateUser(u utils.User) (utils.User, error)
 	GetUserProfile(userId int) (utils.User, error)
+	GetUserById(id int) (utils.User, int, error)
 
 	/* Post */
-	CreatePost(p utils.Post) (utils.Post, error)
+	CreatePost(p utils.Post) (int, int, error)
 
 	/* Comment */
 
 	/* Like */
 
 	/* Follow */
+	FollowUser(uid int, followedId int) (int, error)
 
 	/* Ban */
 
