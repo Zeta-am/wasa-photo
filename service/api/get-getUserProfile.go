@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/Zeta-am/wasa-photo/service/api/reqcontext"
+	"github.com/Zeta-am/wasa-photo/service/database"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -26,7 +27,12 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Get the user from database
-	dbUser, err := rt.db.GetUserProfile(uid)
+	dbUser, res, err := rt.db.GetUserProfile(uid)
+	if res == database.ERROR {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	
 	if err != nil {
 		ctx.Logger.WithError(err).Error("can't get the user from database")
 		w.WriteHeader(http.StatusInternalServerError)

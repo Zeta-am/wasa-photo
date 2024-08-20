@@ -27,7 +27,8 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	// Check if the user exists
-	exist, err := rt.db.IsUsernameExists(user.Username)
+	exist, _, err := rt.db.IsUsernameExists(user.Username)
+	
 	if err != nil {
 		ctx.Logger.WithError(err).Error("can't check if the user exists")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -36,7 +37,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	// If not exist create a new user
 	if !exist {
-		user, err = rt.db.CreateUser(user)
+		user, _, err = rt.db.CreateUser(user)
 		if err != nil {
 			ctx.Logger.WithError(err).Error("can't create the user")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -44,7 +45,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		}
 		w.WriteHeader(http.StatusCreated)
 	} else { // Else get the user from database
-		user, err = rt.db.GetUserByName(user.Username)
+		user, _, err = rt.db.GetUserByName(user.Username)
 		if err != nil {
 			ctx.Logger.WithError(err).Error("can't get the user from database")
 			w.WriteHeader(http.StatusInternalServerError)

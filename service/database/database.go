@@ -41,10 +41,10 @@ import (
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 	/* User */
-	GetUserByName(username string) (utils.User, error)
-	IsUsernameExists(username string) (bool, error)
-	CreateUser(u utils.User) (utils.User, error)
-	GetUserProfile(userId int) (utils.User, error)
+	GetUserByName(username string) (utils.User, int, error)
+	IsUsernameExists(username string) (bool, int, error)
+	CreateUser(u utils.User) (utils.User, int, error)
+	GetUserProfile(userId int) (utils.User, int, error)
 	GetUserById(id int) (utils.User, int, error)
 
 	/* Post */
