@@ -53,11 +53,15 @@ type AppDatabase interface {
 	/* Comment */
 
 	/* Like */
+	LikePhoto(uid int, pid int) (utils.Like, int, error)
+	UnlikePhoto(uid int, pid int) (int, error)
 
 	/* Follow */
 	FollowUser(uid int, followedId int) (int, error)
+	UnfollowUser(uid int, unfollowedIn int) (int, error)
 
 	/* Ban */
+	BanUser(uid int, bannedId int) (int, error)
 
 	Ping() error
 }

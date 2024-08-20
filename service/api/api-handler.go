@@ -16,13 +16,18 @@ import (
 		rt.router.POST("/users/:idUser/posts", rt.wrap(rt.uploadPhoto, true))
 
 		// Comment 
+		rt.router.POST("/users/:idUser/posts/:idPhoto/comments", rt.wrap(rt.commentPhoto, true))
 
 		// Like
+		rt.router.PUT("/users/:idUser/posts/:idPhoto/likes", rt.wrap(rt.likePhoto, true))
+		rt.router.DELETE("/users/:idUser/posts/:idPhoto/likes", rt.wrap(rt.unlikePhoto, true))
 
 		// Follow
 		rt.router.PUT("/users/:idUser/followings/:idFollowed", rt.wrap(rt.followUser, true))
+		rt.router.DELETE("/users/:idUser/followings/:idFollowed", rt.wrap(rt.unfollowUser, true))
 
 		// Ban 
+		rt.router.PUT("/users/:idUser/banList/:idUserBlocked", rt.wrap(rt.banUser, true))
 
 		// Special routes
 		rt.router.GET("/liveness", rt.liveness)

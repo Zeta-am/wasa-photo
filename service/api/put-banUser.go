@@ -10,7 +10,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("Content-type", "application/json")
 
 	// Get the user id from the URL
@@ -26,20 +26,23 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	// Get the user id you want to follow
-	followUid, err := strconv.Atoi(ps.ByName("idFollowed"))
+	// Get the user id you want to ban
+	banId, err := strconv.Atoi(ps.ByName("idUserBlocked"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	// TODO: Controlla che l'utente non sia bannato
-	
+	// Check if the user is trying to ban himself
+	if uid == banId {
+		http.Error(w, "you can't ban yourself", http.StatusBadRequest)
+		return
+	}
 
-	// Follow the user 
-	res, err := rt.db.FollowUser(uid, followUid)
+	// Ban the user
+	res, err := rt.db.BanUser(uid, banId)
 	switch res {
-	case database.UNIQUE_FAILED:	// The user was already followed
+	case database.UNIQUE_FAILED:	// The user was already banned
 		w.WriteHeader(http.StatusOK)
 		return
 	case database.NO_ROWS:
@@ -51,7 +54,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	// Return the followed user 
-	user, res, err := rt.db.GetUserById(followUid)
+	user, res, err := rt.db.GetUserById(banId)
 
 	// Check for errors
 	if res == database.ERROR {
@@ -69,5 +72,5 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	}	
+	}
 }

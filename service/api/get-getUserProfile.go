@@ -30,7 +30,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	dbUser, res, err := rt.db.GetUserProfile(uid)
 	if res == database.ERROR {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return 
 	}
 	
 	if err != nil {
