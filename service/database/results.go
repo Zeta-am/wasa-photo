@@ -22,7 +22,7 @@ func checkResults(err error) int {
 			return UNIQUE_FAILED
 		}
 		if strings.Contains(err.Error(), "converting NULL") {
-			
+			return SUCCESS
 		}
 		return ERROR
 	}

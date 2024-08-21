@@ -5,7 +5,7 @@ info:
     OpenAPI document for the WASAPhoto application
   version: 1.0.2  
 paths:   
-  /users/: # Done
+  /users/: # Done 
     post:
       tags: ["users"]
       summary: Logs in the user
@@ -213,7 +213,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /users/{idUser}/banList/{idUserBlocked}: # TODO after like, comment
+  /users/{idUser}/banList/{idUserBlocked}: # TODO after like, comment   
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idUserBlocked"
@@ -309,7 +309,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         "500": 
            $ref: "#/components/responses/InternalServerError" 
-  /users/{idUser}/posts/{idPhoto}/comments: # TODO
+  /users/{idUser}/posts/{idPhoto}/comments: # Done
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idPhoto"
@@ -317,17 +317,19 @@ paths:
       tags: ["comments"]
       summary: Post a comment
       operationId: commentPhoto
+      requestBody:
+        description: The caption of the comment
+        content:
+          application/json:
+            schema:
+              description: The caption of the comment posted
+              type: object
+              properties:
+                caption:
+                  $ref: "#/components/schemas/Comment/properties/caption"
       responses:
         "200":
-          description: Comment posted
-          content:
-            application/json:
-              schema:
-                description: The comment posted
-                type: object
-                properties:
-                  comment:
-                    $ref: "#/components/schemas/Comment" 
+          $ref: "#/components/responses/OK" 
         "400": 
           $ref: "#/components/responses/BadRequest" 
         "401": 
@@ -404,7 +406,7 @@ paths:
           $ref: "#/components/responses/InternalServerError" 
 
 components:
-  schemas:
+  schemas:  
     Image:
       title: Image
       description: This object represents a single image (as binary of maximum size 20MB)
@@ -520,7 +522,7 @@ components:
           $ref: "#/components/schemas/Post/properties/id"
         upload-time:
           $ref: "#/components/schemas/DateTime"
-        comment:
+        caption:
           type: string
           pattern: 'ˆ\S+$'
           example: Wow!!!

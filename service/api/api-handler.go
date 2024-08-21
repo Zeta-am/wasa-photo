@@ -17,6 +17,7 @@ import (
 
 		// Comment 
 		rt.router.POST("/users/:idUser/posts/:idPhoto/comments", rt.wrap(rt.commentPhoto, true))
+		rt.router.DELETE("/users/:idUser/posts/:idPhoto/comments/:idComment", rt.wrap(rt.uncommentPhoto, true))	
 
 		// Like
 		rt.router.PUT("/users/:idUser/posts/:idPhoto/likes", rt.wrap(rt.likePhoto, true))

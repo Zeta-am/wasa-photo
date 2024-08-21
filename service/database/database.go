@@ -49,8 +49,11 @@ type AppDatabase interface {
 
 	/* Post */
 	CreatePost(p utils.Post) (int, int, error)
+	GetPostById(pid int) (utils.Post, int, error)
 
 	/* Comment */
+	CreateComment(c utils.Comment) (int, int, error)
+	DeleteComment(cid int, pid int, uid int) (int, error)
 
 	/* Like */
 	LikePhoto(uid int, pid int) (utils.Like, int, error)

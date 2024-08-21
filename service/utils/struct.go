@@ -30,7 +30,7 @@ type Comment struct {
 	UserID int 			`json:"userId"`
 	PostID int 			`json:"photoId"`
 	Timestamp string 	`json:"upload-time"`
-	Description string 	`json:"comment"`
+	Caption string 		`json:"caption"`
 }
 
 type Like struct {

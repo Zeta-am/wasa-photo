@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/Zeta-am/wasa-photo/service/api/reqcontext"
 	"github.com/Zeta-am/wasa-photo/service/database"
@@ -12,7 +11,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext	.RequestContext) {
 	w.Header().Set("Content-type", "application/json")
 
 	// Get the user id from the URL
@@ -47,20 +46,15 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	// TODO: Check that the user who posted the photo has not banned the user who wants to comment
 
-	// Read the request body
-	var comm utils.Comment
-	err = json.NewDecoder(r.Body).Decode(&comm	)
+	// Get the id of the comments
+	cid, err := strconv.Atoi(ps.ByName("idComment"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	// Fill the comment object 
-	comm.PostID = pid
-	comm.UserID = uid
-	comm.Timestamp = time.Now().Format("2017-07-21T17:32:28")
 
-	// Create the comment
-	cid, res, err := rt.db.CreateComment(comm)
+	// Delete the comment
+	res, err = rt.db.DeleteComment(cid, pid, uid)
 	switch res {
 	case database.NO_ROWS:
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -70,12 +64,16 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	// Encode the response
+	// Encode the deleted comment
 	w.WriteHeader(http.StatusOK)
-	comm.CommentID = cid
-	err = json.NewEncoder(w).Encode(comm)
+	var delComm = utils.Comment {
+		CommentID: cid,
+		PostID: pid,
+		UserID: uid,
+	}
+	err = json.NewEncoder(w).Encode(delComm)
 	if err != nil {
-		http.Error(w, "can't encode the response: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
