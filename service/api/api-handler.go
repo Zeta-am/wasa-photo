@@ -29,6 +29,7 @@ import (
 
 		// Ban 
 		rt.router.PUT("/users/:idUser/banList/:idUserBlocked", rt.wrap(rt.banUser, true))
+		rt.router.DELETE("/users/:idUser/banList/:idUserBlocked", rt.wrap(rt.unbanUser, true))
 
 		// Special routes
 		rt.router.GET("/liveness", rt.liveness)

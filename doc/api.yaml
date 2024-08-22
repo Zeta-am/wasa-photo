@@ -213,7 +213,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /users/{idUser}/banList/{idUserBlocked}: # TODO after like, comment   
+  /users/{idUser}/banList/{idUserBlocked}: # Done (PUT, DELETE)
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idUserBlocked"
@@ -245,8 +245,8 @@ paths:
         Unban a previously banned user.
         You are only allowed to unban users for yourself.
       responses:
-        "204":
-          description: User unbanned or not banned in the first place.
+        "200":
+          $ref: "#/components/responses/OK"
         "400": 
           $ref: "#/components/responses/BadRequest" 
         "401": 
@@ -336,7 +336,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         "500": 
            $ref: "#/components/responses/InternalServerError" 
-  /users/{idUser}/posts/{idPhoto}/comments/{idComment}:
+  /users/{idUser}/posts/{idPhoto}/comments/{idComment}: # Done
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idPhoto"
@@ -486,10 +486,6 @@ components:
           type: integer
           minimum: 0
           example: 10
-        banned:
-          description: If the user is banned
-          type: boolean
-          example: true
         followed:
           description: If the user is followed
           type: boolean

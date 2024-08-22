@@ -16,10 +16,11 @@ func (db *appdbimpl) CreateComment(c utils.Comment) (int, int, error) {
 
 func (db *appdbimpl) DeleteComment(cid int, pid int, uid int) (int, error) {
 	_, err := db.c.Exec(`DELETE
-							FROM commments
+							FROM comments
 							WHERE comm_id = ? AND post_id = ? AND user_id = ?`, cid, pid, uid)
 	if res := checkResults(err); res != SUCCESS {
 		return res, err
 	}
 	return SUCCESS, nil
 }
+	

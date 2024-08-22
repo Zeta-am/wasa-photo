@@ -65,6 +65,8 @@ type AppDatabase interface {
 
 	/* Ban */
 	BanUser(uid int, bannedId int) (int, error)
+	UnbanUser(uid int, unbannedId int) (int, error)
+	IsBanned(uid int, bannerId int) (bool, int, error)
 
 	Ping() error
 }
