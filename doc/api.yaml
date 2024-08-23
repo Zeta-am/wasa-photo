@@ -134,6 +134,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         "401": 
           $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: '#/components/responses/NotFound'
         "500":
@@ -334,6 +336,8 @@ paths:
           $ref: "#/components/responses/BadRequest" 
         "401": 
           $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "500": 
            $ref: "#/components/responses/InternalServerError" 
   /users/{idUser}/posts/{idPhoto}/comments/{idComment}: # Done
@@ -365,29 +369,15 @@ paths:
       tags: ["likes"]
       responses:
         "200":
-          description: Your like was already added
-          content:
-            application/json:
-              schema:
-                description: The like
-                type: object
-                properties:
-                  like:
-                    $ref: "#/components/schemas/Like" 
+          $ref: "#/components/responses/OK"
         "201":
-          description: Your like was successfully added
-          content:
-            application/json:
-              schema: 
-                description: The like
-                type: object
-                properties:
-                  like:
-                    $ref: "#/components/schemas/Like" 
+          $ref: "#/components/responses/Created"
         "400": 
           $ref: "#/components/responses/BadRequest" 
         "401": 
           $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "500": 
            $ref: "#/components/responses/InternalServerError"
     delete:
@@ -397,7 +387,7 @@ paths:
       operationId: unlikePhoto
       responses:
         "204":
-          description: Your like was removed
+          $ref: "#/components/responses/No content"
         "400": 
           $ref: "#/components/responses/BadRequest" 
         "404": 
@@ -604,6 +594,7 @@ components:
       content:
         application/json:
           schema:
+            description: The message of the error
             type: object
             properties:
               err:
@@ -615,6 +606,7 @@ components:
         application/json:
           schema:
             type: object
+            description: The message of the error
             properties:
               err:
                 $ref: "#/components/schemas/Message"
@@ -625,6 +617,7 @@ components:
         application/json:
           schema:
             type: object
+            description: The message of the error
             properties:
               err:
                 $ref: "#/components/schemas/Message"
@@ -635,6 +628,7 @@ components:
         application/json:
           schema:
             type: object
+            description: The message of the error
             properties:
               err:
                 $ref: "#/components/schemas/Message"
@@ -644,6 +638,18 @@ components:
       content:
         application/json:
           schema:
+            type: object
+            description: The message of the error
+            properties:
+              err:
+                $ref: "#/components/schemas/Message"
+    Forbidden:  # 403
+      description: 
+        Access denied. You do not have the permission to access this resource or perform this action
+      content:
+        application/json:
+          schema:
+            description: The message of the error
             type: object
             properties:
               err:
@@ -655,6 +661,7 @@ components:
         application/json:
           schema: 
             type: object
+            description: The message of the error
             properties:
               err:
                 $ref: "#/components/schemas/Message"
@@ -665,6 +672,7 @@ components:
         application/json:
           schema:
             type: object
+            description: The message of the error
             properties:
               err:
                 $ref: "#/components/schemas/Message"
@@ -674,6 +682,7 @@ components:
         application/json:
           schema:
             type: object
+            description: The message of the error
             properties:
               err: 
                 $ref: "#/components/schemas/Message"
@@ -683,6 +692,7 @@ components:
         application/json:
           schema:
             type: object
+            description: The message of the error
             properties:
               err:
                 $ref: "#/components/schemas/Message"

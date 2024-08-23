@@ -36,7 +36,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// Check if the photo exists
-	_, res, err := rt.db.GetPostById(pid)
+	post, res, err := rt.db.GetPostById(pid)
 	if res == database.NO_ROWS {
 		http.Error(w, "post not found", http.StatusNotFound)
 		return
@@ -46,10 +46,19 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// TODO: Check that the user who posted the photo has not banned the user who wants to comment
+	banned, _, err := rt.db.IsBanned(uid, post.UserID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return 
+	}
+	if banned {
+		http.Error(w, "access denied. You cannot perform this action because the user is banned.", http.StatusForbidden)
+		return
+	}
 
 	// Read the request body
 	var comm utils.Comment
-	err = json.NewDecoder(r.Body).Decode(&comm	)
+	err = json.NewDecoder(r.Body).Decode(&comm)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

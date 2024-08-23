@@ -5,10 +5,6 @@ import (
 	"github.com/Zeta-am/wasa-photo/service/utils"
 )
 
-// TODO: Rivedi tutta la struttura di aggiornamento dei dati e di controllo degli errori di tutti
-// i metodi scritti		
-// func (db *appdbimpl) fillUser(user utils.User) (utils.User, int, error) 
-
 func (db *appdbimpl) GetUserByName(username string) (utils.User, int, error) {
 	var user utils.User
 	err := db.c.QueryRow(`SELECT user_id, username 
@@ -19,7 +15,7 @@ func (db *appdbimpl) GetUserByName(username string) (utils.User, int, error) {
 		return user, res, err
 	}
 
-	return user, res, nil
+	return db.fillUser(user)
 }
 
 func (db *appdbimpl) GetUserById(id int) (utils.User, int, error) {
@@ -32,7 +28,7 @@ func (db *appdbimpl) GetUserById(id int) (utils.User, int, error) {
 	if res != SUCCESS {
 		return utils.User{}, res, err
 	}			
-	return user, res, nil
+	return db.fillUser(user)
 }
 
 func (db *appdbimpl) IsUsernameExists(username string) (bool, int, error) {
@@ -97,4 +93,32 @@ func (db *appdbimpl) GetUserProfile(userId int) (utils.User, int, error) {
 
 	//TODO: Check if is banned
 	return user, res, nil
+}
+
+func (db *appdbimpl) fillUser(u utils.User) (utils.User, int, error) {
+	// Fill FollowerCount field
+	err := db.c.QueryRow(`SELECT COUNT(*)
+						FROM follows
+						WHERE followed_id = ?`, u.UserID).Scan(&u.FollowerCount)	
+	if err != nil {
+		return utils.User{}, ERROR, err
+	}
+
+	// Fill FollowingCount field
+	err = db.c.QueryRow(`SELECT COUNT(*)
+						FROM follows
+						WHERE follower_id = ?`, u.UserID).Scan(&u.FollowingCount)
+	if err != nil {
+		return utils.User{}, ERROR, err
+	}
+
+	// Fill PostCount field
+	err = db.c.QueryRow(`SELECT COUNT(*)
+						FROM posts
+						WHERE user_id = ?`, u.UserID).Scan(&u.PostCount)
+	if err != nil {
+		return utils.User{}, ERROR, err
+	}
+
+	return u, SUCCESS, nil
 }

@@ -36,7 +36,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// Unlike the photo
-	res, err := rt.db.UnfollowUser(uid, pid)
+	res, err := rt.db.UnlikePhoto(uid, pid)
 	if res == database.NO_ROWS {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return

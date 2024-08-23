@@ -14,6 +14,7 @@ import (
 	
 		// Post 
 		rt.router.POST("/users/:idUser/posts", rt.wrap(rt.uploadPhoto, true))
+		rt.router.DELETE("/users/:idUser/posts/:idPhoto", rt.wrap(rt.deletePhoto, true))
 
 		// Comment 
 		rt.router.POST("/users/:idUser/posts/:idPhoto/comments", rt.wrap(rt.commentPhoto, true))

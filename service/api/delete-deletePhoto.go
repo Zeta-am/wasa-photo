@@ -1,17 +1,17 @@
 package api
 
 import (
-	"encoding/json"
+	"encoding/json"	
 	"net/http"
 	"strconv"
 
 	"github.com/Zeta-am/wasa-photo/service/api/reqcontext"
 	"github.com/Zeta-am/wasa-photo/service/database"
-	"github.com/Zeta-am/wasa-photo/service/utils"
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext	.RequestContext) {
+
+func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("Content-type", "application/json")
 
 	// Get the user id from the URL
@@ -30,12 +30,12 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	// Get the id of the photo
 	pid, err := strconv.Atoi(ps.ByName("idPhoto"))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Check if the photo exists
-	_, res, err := rt.db.GetPostById(pid)
+	post, res, err := rt.db.GetPostById(pid)
 	if res == database.NO_ROWS {
 		http.Error(w, "post not found", http.StatusNotFound)
 		return
@@ -44,35 +44,23 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		return						
 	}
 
-	// Get the id of the comments
-	cid, err := strconv.Atoi(ps.ByName("idComment"))
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// Delete the comment
-	res, err = rt.db.DeleteComment(cid, pid, uid)
+	// Delete the photo
+	res, err = rt.db.DeletePost(pid)
 	switch res {
 	case database.NO_ROWS:
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Error(w, "post to be deleted was not found", http.StatusNotFound)
 		return
 	case database.ERROR:
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Encode the deleted comment
+	// Encode the response
 	w.WriteHeader(http.StatusOK)
-	var delComm = utils.Comment {
-		CommentID: cid,
-		PostID: pid,
-		UserID: uid,
-	}
-	err = json.NewEncoder(w).Encode(delComm)
+	err = json.NewEncoder(w).Encode(post)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	return		
 	}
-
+	ctx.Logger.Info("Post deleted")
 }

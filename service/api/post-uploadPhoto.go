@@ -69,7 +69,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	pid, res, err := rt.db.CreatePost(post)
 
 	// Check for errors
-	if res == database.ERROR {
+	if res == database.ERROR {		
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -89,4 +89,5 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}		
+	ctx.Logger.Info("Post uploaded")
 }

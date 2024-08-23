@@ -39,13 +39,22 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// TODO: finisci di fare i controlli	
 	if banned {
+		http.Error(w, "access denied. You cannot perform this action because the user is banned.", http.StatusForbidden)
+		return
+	}
+
+	// Check that you are not trying to follow a user banned by us
+	banned, _, err = rt.db.IsBanned(followUid, uid)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if banned {
+		http.Error(w, "access denied. You cannot perform this action because the user is banned.", http.StatusForbidden)
 		return
 	}
 	
-
 	// Follow the user 
 	res, err := rt.db.FollowUser(uid, followUid)
 	switch res {
@@ -74,7 +83,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	// Encode the response
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

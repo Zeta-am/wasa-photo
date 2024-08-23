@@ -50,6 +50,7 @@ type AppDatabase interface {
 	/* Post */
 	CreatePost(p utils.Post) (int, int, error)
 	GetPostById(pid int) (utils.Post, int, error)
+	DeletePost(pid int) (int, error)
 
 	/* Comment */
 	CreateComment(c utils.Comment) (int, int, error)
