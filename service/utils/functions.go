@@ -16,14 +16,6 @@ func GetAuthorization(w http.ResponseWriter, r *http.Request) (int, error) {
 	return auth, nil	
 }
 
-func SetHeaderJson(w http.ResponseWriter) {
-	w.Header().Set("Content-type", "application/json")
-}
-
-func SetHeaderText(w http.ResponseWriter) {
-	w.Header().Set("Content-type", "text/plain")
-}
-
 func ValidateUsername(username string) error {
 	if len(username) == 0 {
 		return ErrMissingUsername

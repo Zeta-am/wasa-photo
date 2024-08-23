@@ -10,24 +10,24 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getBannedList(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("Content-type", "application/json")
 
-	// Get uid from the url
+	// Get the user id from the URL
 	uid, err := strconv.Atoi(ps.ByName("idUser"))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
-	}	
+	}
 
-	// Check if the ID of the path is equal to the ID of the authorization
+	// Check if the user is authorized
 	if uid != ctx.UserID {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	// Get the list of the followers from the database
-	followers, res, err := rt.db.GetListFollowers(uid)
+	// Get the list of user banned
+	users, res, err := rt.db.GetBannedList(uid)
 	if res == database.ERROR || err != nil{
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -35,9 +35,9 @@ func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps http
 
 	// Encode the response
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(followers)
+	err = json.NewEncoder(w).Encode(users)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}	
-}
+}	

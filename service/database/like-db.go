@@ -2,7 +2,7 @@ package database
 
 import "github.com/Zeta-am/wasa-photo/service/utils"
 
-func (db appdbimpl) LikePhoto(uid int, pid int) (utils.Like, int, error) {
+func (db *appdbimpl) LikePhoto(uid int, pid int) (utils.Like, int, error) {
 	var like utils.Like
 	_, err := db.c.Exec(`INSERT
 							INTO likes(user_id, post_id)
@@ -15,7 +15,7 @@ func (db appdbimpl) LikePhoto(uid int, pid int) (utils.Like, int, error) {
 	return like, SUCCESS, nil
 }
 
-func (db appdbimpl) UnlikePhoto(uid int, pid int) (int, error) {
+func (db *appdbimpl) UnlikePhoto(uid int, pid int) (int, error) {
 	_, err := db.c.Exec(`DELETE
 							FROM likes
 							WHERE user_id = ? AND post_id = ?`, uid, pid)

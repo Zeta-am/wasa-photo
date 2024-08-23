@@ -75,7 +75,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /users/{idUser}/followers:
+  /users/{idUser}/followers: # Done 
     parameters:
       - $ref: "#/components/parameters/idUser"
     get:
@@ -95,7 +95,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /users/{idUser}/followings:
+  /users/{idUser}/followings: # Done
     parameters:
       - $ref: "#/components/parameters/idUser"
     get:
@@ -157,14 +157,14 @@ paths:
           $ref: '#/components/responses/NotFound'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /users/{idUser}/edit:
+  /users/{idUser}/edit: # Done
     parameters:
       - $ref: "#/components/parameters/idUser"
     put:
       tags: ["users"]
       summary: Change the username
       description: Set a new username
-      operationId: setMyUserName
+      operationId: setMyUsername
       requestBody:
         description: The new username
         content:
@@ -195,10 +195,9 @@ paths:
           $ref: '#/components/responses/NotFound'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /users/{idUser}/banList:
+  /users/{idUser}/banList: # Done 
     parameters:
       - $ref: "#/components/parameters/idUser"
-    
     get:
       tags: ["bans"]
       operationId: getBannedList
@@ -293,7 +292,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         "500":
           $ref: "#/components/responses/InternalServerError" 
-  /users/{idUser}/posts/{idPhoto}:
+  /users/{idUser}/posts/{idPhoto}: # Done
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idPhoto"

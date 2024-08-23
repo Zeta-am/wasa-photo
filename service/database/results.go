@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"errors"
 	"strings"
+
+	"github.com/Zeta-am/wasa-photo/service/utils"
 )
 
 const (
@@ -28,4 +30,28 @@ func checkResults(err error) int {
 	}
 
 	return SUCCESS
+}
+
+func getUsers(rows *sql.Rows) ([]utils.User, int, error) {
+	var err error = nil
+	var users []utils.User
+	defer func ()  {
+		if closeErr := rows.Close(); closeErr != nil {
+			err = closeErr
+		}	
+	}()
+	
+	// Get the user_id and username from the rows selected	
+	for rows.Next() {
+		var usr utils.User
+		if err = rows.Scan(&usr.UserID, &usr.Username); err != nil {
+			return nil, ERROR, err
+		}
+		users = append(users, usr)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, ERROR, err
+	}
+	return users, SUCCESS, nil
 }

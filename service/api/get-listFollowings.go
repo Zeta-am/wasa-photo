@@ -10,7 +10,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
+ func (rt *_router) listFollowings(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("Content-type", "application/json")
 
 	// Get uid from the url
@@ -27,7 +28,7 @@ func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	// Get the list of the followers from the database
-	followers, res, err := rt.db.GetListFollowers(uid)
+	followers, res, err := rt.db.GetListFollowings(uid)
 	if res == database.ERROR || err != nil{
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -39,5 +40,5 @@ func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps http
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	}	
-}
+	}
+ }

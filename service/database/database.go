@@ -46,6 +46,7 @@ type AppDatabase interface {
 	CreateUser(u utils.User) (utils.User, int, error)
 	GetUserProfile(userId int) (utils.User, int, error)
 	GetUserById(id int) (utils.User, int, error)
+	SetMyUsername(username string, uid int) (int, error)
 
 	/* Post */
 	CreatePost(p utils.Post) (int, int, error)
@@ -63,11 +64,14 @@ type AppDatabase interface {
 	/* Follow */
 	FollowUser(uid int, followedId int) (int, error)
 	UnfollowUser(uid int, unfollowedIn int) (int, error)
+	GetListFollowers(uid int) ([]utils.User, int, error)
+	GetListFollowings(uid int) ([]utils.User, int, error)
 
 	/* Ban */
 	BanUser(uid int, bannedId int) (int, error)
 	UnbanUser(uid int, unbannedId int) (int, error)
 	IsBanned(uid int, bannerId int) (bool, int, error)
+	GetBannedList(uid int) ([]utils.User, int, error)
 
 	Ping() error
 }

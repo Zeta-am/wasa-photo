@@ -1,10 +1,25 @@
 package database
 
 import (
-	
+	"database/sql"
+
 	"github.com/Zeta-am/wasa-photo/service/utils"
 )
 
+
+var GET_USER_STREAM =  `SELECT
+							p.*, 
+							u.username,
+							COUNT(l.post_id) AS like_count,
+							MAX(l.user_id = ?) AS liked
+						FROM posts p
+						INNER JOIN follows f ON p.user_id = f.followed_id
+						INNER JOIN users u ON p.user_id = u.user_id
+						LEFT JOIN likes l ON p.post_id = l.post_id
+						WHERE f.follower_id = ?
+						GROUP BY p.post_id
+						ORDER BY p.timestamp DESC`
+						
 func (db *appdbimpl) GetUserByName(username string) (utils.User, int, error) {
 	var user utils.User
 	err := db.c.QueryRow(`SELECT user_id, username 
@@ -122,3 +137,37 @@ func (db *appdbimpl) fillUser(u utils.User) (utils.User, int, error) {
 
 	return u, SUCCESS, nil
 }
+
+
+func (db *appdbimpl) SetMyUsername(username string, uid int) (int, error) {
+	_, err := db.c.Exec(`UPDATE users
+							SET username = ?
+							WHERE user_id = ?`, username, uid)
+	if res := checkResults(err); res != SUCCESS {
+		return res, err
+	}
+	return SUCCESS, nil
+}
+
+func (db *appdbimpl) GetUserStream(uid int) ([]utils.Post, int, error) {
+	rows, err := db.c.Query(GET_USER_STREAM, uid, uid)
+	if err != nil {
+		return nil, ERROR, err
+	}
+	var stream []utils.Post
+	defer func ()  {
+		if closeErr := rows.Close(); closeErr != nil {
+			err = closeErr
+		}
+	} ()
+
+	for rows.Next() {
+		var post utils.Post
+		var nullCapt sql.NullString
+		if err := rows.Scan(&post.PostID, &post.UserID, &post.Image, &post.Timestamp, &nullCapt); err != nil {
+			return stream, 0, nil	
+		}
+	}
+	return nil, 0, nil
+}
+

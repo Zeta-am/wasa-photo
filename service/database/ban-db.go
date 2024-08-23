@@ -1,5 +1,7 @@
 package database
 
+import "github.com/Zeta-am/wasa-photo/service/utils"
+
 func (db *appdbimpl) BanUser(uid int, bannedId int) (int, error) {
 	// Begin a transaction
 	tx, err := db.c.Begin()
@@ -47,7 +49,7 @@ func (db *appdbimpl) BanUser(uid int, bannedId int) (int, error) {
 	return SUCCESS, nil
 }
 
-func (db appdbimpl) UnbanUser(uid int, unbannedId int) (int, error) {
+func (db *appdbimpl) UnbanUser(uid int, unbannedId int) (int, error) {
 	_, err := db.c.Exec(`DELETE
 							FROM bans
 							WHERE user_id = ? AND banned_id = ?`, uid, unbannedId)
@@ -59,7 +61,7 @@ func (db appdbimpl) UnbanUser(uid int, unbannedId int) (int, error) {
 
 
 // Check if uid is banned by bannerId
-func (db appdbimpl) IsBanned(uid int, bannerId int) (bool, int, error) {
+func (db *appdbimpl) IsBanned(uid int, bannerId int) (bool, int, error) {
 	var value int 
 	err := db.c.QueryRow(`SELECT EXISTS(
 							SELECT 1
@@ -69,4 +71,16 @@ func (db appdbimpl) IsBanned(uid int, bannerId int) (bool, int, error) {
 		return false, res, err
 	}
 	return true, SUCCESS, nil
+}
+
+func (db *appdbimpl) GetBannedList(uid int) ([]utils.User, int, error) {
+	rows, err := db.c.Query(`SELECT users.user_id, users.username
+								FROM users
+								INNER JOIN bans ON users.user_id = bans.banned_id
+								WHERE bans.user_id = ?`, uid)
+	if err != nil {
+		return nil, ERROR, err
+	}
+
+	return getUsers(rows)
 }
