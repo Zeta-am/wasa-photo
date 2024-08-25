@@ -5,7 +5,7 @@ info:
     OpenAPI document for the WASAPhoto application
   version: 1.0.2  
 paths:   
-  /users/: # Done 
+  /users/:
     post:
       tags: ["users"]
       summary: Logs in the user
@@ -36,7 +36,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
       security: [] 
-  /users/{idUser}: # Done
+  /users/{idUser}:
     parameters:
         - $ref: "#/components/parameters/idUser"
     get:
@@ -75,7 +75,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /users/{idUser}/followers: # Done 
+  /users/{idUser}/followers:
     parameters:
       - $ref: "#/components/parameters/idUser"
     get:
@@ -95,7 +95,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /users/{idUser}/followings: # Done
+  /users/{idUser}/followings:
     parameters:
       - $ref: "#/components/parameters/idUser"
     get:
@@ -115,7 +115,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /users/{idUser}/followings/{idFollowed}: # Done (PUT, DELETE)
+  /users/{idUser}/followings/{idFollowed}:
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idFollowed"
@@ -157,7 +157,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /users/{idUser}/edit: # Done
+  /users/{idUser}/edit:
     parameters:
       - $ref: "#/components/parameters/idUser"
     put:
@@ -195,7 +195,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /users/{idUser}/banList: # Done 
+  /users/{idUser}/banList:
     parameters:
       - $ref: "#/components/parameters/idUser"
     get:
@@ -214,7 +214,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /users/{idUser}/banList/{idUserBlocked}: # Done (PUT, DELETE)
+  /users/{idUser}/banList/{idUserBlocked}:
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idUserBlocked"
@@ -254,7 +254,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         "500": 
           $ref: "#/components/responses/InternalServerError" 
-  /users/{idUser}/posts: # Done
+  /users/{idUser}/posts:
     parameters:
       - $ref: "#/components/parameters/idUser"
     post:
@@ -292,7 +292,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         "500":
           $ref: "#/components/responses/InternalServerError" 
-  /users/{idUser}/posts/{idPhoto}: # Done
+  /users/{idUser}/posts/{idPhoto}:
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idPhoto"
@@ -310,7 +310,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         "500": 
            $ref: "#/components/responses/InternalServerError" 
-  /users/{idUser}/posts/{idPhoto}/comments: # Done
+  /users/{idUser}/posts/{idPhoto}/comments: # TODO GET
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idPhoto"
@@ -339,7 +339,21 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "500": 
            $ref: "#/components/responses/InternalServerError" 
-  /users/{idUser}/posts/{idPhoto}/comments/{idComment}: # Done
+    get:
+      tags: ["comments"]
+      summary: Get comments
+      description: Get the list of comments posted by user
+      operationId: getComments
+      responses:
+        "200":
+          $ref: "#/components/responses/OK"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /users/{idUser}/posts/{idPhoto}/comments/{idComment}:
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idPhoto"
@@ -357,7 +371,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         "500": 
            $ref: "#/components/responses/InternalServerError"
-  /users/{idUser}/posts/{idPhoto}/likes: # Done (PUT, DELETE)   
+  /users/{idUser}/posts/{idPhoto}/likes: # TODO GET
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idPhoto"
@@ -389,6 +403,24 @@ paths:
           $ref: "#/components/responses/No content"
         "400": 
           $ref: "#/components/responses/BadRequest" 
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
+        "404": 
+          $ref: "#/components/responses/NotFound" 
+        "500":
+          $ref: "#/components/responses/InternalServerError" 
+    get:
+      summary: Get likes
+      description: Get the list of likes put by user
+      tags: ["likes"]
+      operationId: getLikes
+      responses:
+        "200":
+          $ref: "#/components/responses/OK"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
         "404": 
           $ref: "#/components/responses/NotFound" 
         "500":
@@ -550,7 +582,6 @@ components:
           minLength: 0
           maxLength: 200
 
-
   parameters:
     idPhoto:
       name: idPhoto
@@ -696,8 +727,7 @@ components:
             description: The message of the error
             properties:
               err:
-                $ref: "#/components/schemas/Message"
-    
+                $ref: "#/components/schemas/Message"    
 
   securitySchemes:
     bearerAuth:
@@ -707,7 +737,6 @@ components:
 # Apply the security global, to all the operations
 security:
   - bearerAuth: []
-
 
 tags:
   - name: users

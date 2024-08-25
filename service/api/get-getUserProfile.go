@@ -39,8 +39,6 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	//TODO: check if the user is banned
-
 	// Send the response
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(dbUser)

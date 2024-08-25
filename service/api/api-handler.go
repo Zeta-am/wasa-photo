@@ -11,6 +11,7 @@ import (
 		rt.router.GET("/users/:idUser", rt.wrap(rt.getUserProfile, true))
 		rt.router.GET("/users/:idUser/stream", rt.wrap(rt.getMyStream, true))
 		rt.router.PUT("/users/:idUser/edit", rt.wrap(rt.setMyUsername, true))
+		// getPhotos
 	
 		// Post 
 		rt.router.POST("/users/:idUser/posts", rt.wrap(rt.uploadPhoto, true))
@@ -19,10 +20,12 @@ import (
 		// Comment 
 		rt.router.POST("/users/:idUser/posts/:idPhoto/comments", rt.wrap(rt.commentPhoto, true))
 		rt.router.DELETE("/users/:idUser/posts/:idPhoto/comments/:idComment", rt.wrap(rt.uncommentPhoto, true))	
+		// getComments
 
 		// Like
 		rt.router.PUT("/users/:idUser/posts/:idPhoto/likes", rt.wrap(rt.likePhoto, true))
 		rt.router.DELETE("/users/:idUser/posts/:idPhoto/likes", rt.wrap(rt.unlikePhoto, true))
+		rt.router.GET("/users/:idUser/posts/:idPhoto/likes", rt.wrap(rt.getLikes, true))	
 
 		// Follow
 		rt.router.PUT("/users/:idUser/followings/:idFollowed", rt.wrap(rt.followUser, true))
