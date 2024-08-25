@@ -3,22 +3,25 @@ package database
 import (
 	"database/sql"
 
-	"github.com/Zeta-am/wasa-photo/service/utils"
+	"github.com/Zeta-am/wasa-photo/service/utils"		
 )
 
 
 var GET_USER_STREAM =  `SELECT
 							p.*, 
 							u.username,
-							COUNT(l.post_id) AS like_count,
-							MAX(l.user_id = ?) AS liked
+							COUNT(DISTINCT l.post_id) AS like_count,
+							COUNT(DISTINCT c.comm_id) AS comment_count,
+							MAX(l.user_id IS NOT NULL AND l.user_id = ?) AS liked	
 						FROM posts p
 						INNER JOIN follows f ON p.user_id = f.followed_id
 						INNER JOIN users u ON p.user_id = u.user_id
 						LEFT JOIN likes l ON p.post_id = l.post_id
+						LEFT JOIN comments c ON p.post_id = c.post_id
 						WHERE f.follower_id = ?
 						GROUP BY p.post_id
-						ORDER BY p.timestamp DESC`
+						ORDER BY p.timestamp DESC;
+`
 						
 func (db *appdbimpl) GetUserByName(username string) (utils.User, int, error) {
 	var user utils.User
@@ -149,25 +152,32 @@ func (db *appdbimpl) SetMyUsername(username string, uid int) (int, error) {
 	return SUCCESS, nil
 }
 
-func (db *appdbimpl) GetUserStream(uid int) ([]utils.Post, int, error) {
-	rows, err := db.c.Query(GET_USER_STREAM, uid, uid)
+func (db *appdbimpl) GetMyStream(uid int) ([]utils.Post, int, error) {
+	rows, err := db.c.Query(GET_USER_STREAM, uid	, uid)
 	if err != nil {
 		return nil, ERROR, err
 	}
-	var stream []utils.Post
 	defer func ()  {
 		if closeErr := rows.Close(); closeErr != nil {
 			err = closeErr
 		}
-	} ()
-
+		} ()
+	
+	var stream []utils.Post
 	for rows.Next() {
 		var post utils.Post
 		var nullCapt sql.NullString
-		if err := rows.Scan(&post.PostID, &post.UserID, &post.Image, &post.Timestamp, &nullCapt); err != nil {
-			return stream, 0, nil	
+		if err := rows.Scan(&post.PostID, &post.UserID, &post.Image, &post.Timestamp, &nullCapt, &post.Username, &post.LikeCount, &post.CommentCount, &post.Liked); err != nil {
+			return nil, ERROR, err
 		}
+		post.Caption = nullCapt.String
+		stream = append(stream, post)
 	}
-	return nil, 0, nil
+
+	if err = rows.Err(); err != nil {
+		return nil, ERROR, err
+	}
+
+	return stream, SUCCESS, nil
 }
 

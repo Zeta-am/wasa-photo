@@ -15,8 +15,9 @@ type User struct {
 
 type Post struct {
 	PostID int 			`json:"id"`
-	Image string 		`json:"image"`
+	Image string 		`json:"image"`	
 	UserID int 			`json:"user-id"`
+	Username string		`json:"username"`
 	LikeCount int 		`json:"like-numbers"`
 	CommentCount int 	`json:"comment-numbers"`
 	Timestamp string 	`json:"upload-time"`

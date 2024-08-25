@@ -63,7 +63,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 	post.Image = base64.StdEncoding.EncodeToString(image)
-	post.Timestamp = time.Now().Format("2017-07-21T17:32:28")
+	post.Timestamp = time.Now().Format(time.RFC3339)
 
 	// Create the post in the database
 	pid, res, err := rt.db.CreatePost(post)

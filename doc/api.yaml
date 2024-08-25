@@ -417,6 +417,8 @@ components:
           $ref: "#/components/schemas/Image"
         user-id:
           $ref: "#/components/schemas/User/properties/id"
+        username:
+          $ref: "#/components/schemas/Username"
         like-numbers:
           description: Number of likes of this post
           type: integer

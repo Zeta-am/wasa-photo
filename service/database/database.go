@@ -47,6 +47,7 @@ type AppDatabase interface {
 	GetUserProfile(userId int) (utils.User, int, error)
 	GetUserById(id int) (utils.User, int, error)
 	SetMyUsername(username string, uid int) (int, error)
+	GetMyStream(uid int) ([]utils.Post, int, error)
 
 	/* Post */
 	CreatePost(p utils.Post) (int, int, error)

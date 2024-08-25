@@ -66,7 +66,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	// Fill the comment object 
 	comm.PostID = pid
 	comm.UserID = uid
-	comm.Timestamp = time.Now().Format("2017-07-21T17:32:28")
+	comm.Timestamp = time.Now().Format(time.RFC3339)
 
 	// Create the comment
 	cid, res, err := rt.db.CreateComment(comm)
