@@ -23,4 +23,30 @@ func (db *appdbimpl) DeleteComment(cid int, pid int, uid int) (int, error) {
 	}
 	return SUCCESS, nil
 }
+
+func (db *appdbimpl) GetComments(uid int, pid int) ([]utils.Comment, int, error) {
+	rows, err := db.c.Query(`SELECT * 
+								FROM comments
+								WHERE user_id = ? AND post_id = ?`, uid, pid)
+	if res := checkResults(err); res != SUCCESS {
+		return nil, res, err
+	}
+	defer func ()  {
+		if errow := rows.Close(); errow != nil {
+			err = errow
+		}	
+	}()
+	var comms []utils.Comment
+	for rows.Next() {
+		var comm utils.Comment
+		if err = rows.Scan(&comm.CommentID, &comm.UserID, &comm.PostID); err != nil {
+			return nil, ERROR, err
+		}
+		comms = append(comms, comm)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, ERROR, err
+	}
+	return comms, SUCCESS, nil
+}
 	

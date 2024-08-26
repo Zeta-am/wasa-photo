@@ -48,6 +48,7 @@ type AppDatabase interface {
 	GetUserById(id int) (utils.User, int, error)
 	SetMyUsername(username string, uid int) (int, error)
 	GetMyStream(uid int) ([]utils.Post, int, error)
+	GetUserPhotos(uid int) ([]utils.Post, int, error)
 
 	/* Post */
 	CreatePost(p utils.Post) (int, int, error)
@@ -57,10 +58,12 @@ type AppDatabase interface {
 	/* Comment */
 	CreateComment(c utils.Comment) (int, int, error)
 	DeleteComment(cid int, pid int, uid int) (int, error)
+	GetComments(uid int, pid int) ([]utils.Comment, int, error)
 
 	/* Like */
 	LikePhoto(uid int, pid int) (utils.Like, int, error)
 	UnlikePhoto(uid int, pid int) (int, error)
+	GetLikes(uid int, pid int) ([]utils.Like, int, error)
 
 	/* Follow */
 	FollowUser(uid int, followedId int) (int, error)

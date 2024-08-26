@@ -10,7 +10,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("Content-type", "application/json")
 
 	// Get the uid from the url
@@ -33,8 +33,8 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 		return 
 	}
 
-	// Get likes from the database
-	likes, res, err := rt.db.GetLikes(uid, pid	)
+	// Get the comments from database
+	comms, res, err := rt.db.GetComments(uid, pid)
 	if res == database.ERROR {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -42,9 +42,8 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 
 	// Encode the response
 	w.WriteHeader(http.StatusOK)
-	if err = json.NewEncoder(w).Encode(likes); err != nil {
+	if err = json.NewEncoder(w).Encode(comms); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	return		
+		return
 	}
-	
 }

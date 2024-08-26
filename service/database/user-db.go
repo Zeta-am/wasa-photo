@@ -156,7 +156,7 @@ func (db *appdbimpl) GetMyStream(uid int) ([]utils.Post, int, error) {
 	rows, err := db.c.Query(GET_USER_STREAM, uid	, uid)
 	if err != nil {
 		return nil, ERROR, err
-	}
+	} 
 	defer func ()  {
 		if closeErr := rows.Close(); closeErr != nil {
 			err = closeErr
@@ -179,5 +179,39 @@ func (db *appdbimpl) GetMyStream(uid int) ([]utils.Post, int, error) {
 	}
 
 	return stream, SUCCESS, nil
+}
+ 
+func (db *appdbimpl) GetUserPhotos(uid int) ([]utils.Post, int, error) {
+	rows, err := db.c.Query(`SELECT p.*,
+									COUNT(DISTINCT l.post_id) AS like_count,
+									COUNT(DISTINCT c.comm_id) AS comment_count
+							FROM posts p
+							LEFT JOIN likes l ON p.post_id = l.post_id
+							LEFT JOIN comments c ON p.post_id = c.post_id
+							WHERE p.user_id = ?
+							GROUP BY p.post_id
+							ORDER BY p.timestamp DESC`, uid)
+	if err != nil {
+		return nil, ERROR, err
+	}
+
+	defer func ()  {
+		if errow := rows.Close(); errow != nil {
+			err = errow
+		}
+	} ()
+
+	var posts []utils.Post
+	for rows.Next() {
+		var post utils.Post
+		if err = rows.Scan(&post.PostID, &post.UserID, &post.Image, &post.Timestamp, &post.Caption, &post.LikeCount, &post.CommentCount); err != nil {
+			return nil, ERROR, err
+		}
+		posts = append(posts, post)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, ERROR, err
+	}
+	return posts, SUCCESS, nil
 }
 
