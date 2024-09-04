@@ -10,7 +10,7 @@ import (
 		rt.router.POST("/users", rt.wrap(rt.doLogin, false))
 		rt.router.GET("/users/:idUser", rt.wrap(rt.getUserProfile, true))
 		rt.router.GET("/users/:idUser/stream", rt.wrap(rt.getMyStream, true))
-		rt.router.PUT("/users/:idUser/edit", rt.wrap(rt.setMyUsername, true))
+		rt.router.PUT("/users/:idUser/edit", rt.wrap(rt.setMyUserName, true))
 		rt.router.GET("/users/:idUser/posts", rt.wrap(rt.getUserPhotos, true))
 	
 		// Post 

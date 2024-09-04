@@ -148,7 +148,7 @@ paths:
       tags: ["follows"]
       responses:
         "204":
-          description: You are not following this user anymore
+          $ref: "#/components/responses/No content"
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -164,7 +164,7 @@ paths:
       tags: ["users"]
       summary: Change the username
       description: Set a new username
-      operationId: setMyUsername
+      operationId: setMyUserName
       requestBody:
         description: The new username
         content:
@@ -260,6 +260,8 @@ paths:
     post:
       tags: ["photos"]
       summary: Upload a photo
+      description: | 
+        Upload a post made up of an image and other informations (likes, comments, caption, ...)
       operationId: uploadPhoto
       parameters:
         - name: caption
@@ -268,7 +270,6 @@ paths:
           required: true
           schema:
             $ref: "#/components/schemas/Message"
-
       requestBody:
         description: The binary image file of the photo
         content:
@@ -277,15 +278,7 @@ paths:
               $ref: "#/components/schemas/Image"
       responses:
         "201":
-          description: The post was created
-          content:
-            application/json:
-              schema:
-                description: The post created
-                type: object
-                properties:
-                  post:
-                    $ref: "#/components/schemas/Post"
+          $ref: "#/components/responses/Created"
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -295,7 +288,7 @@ paths:
     get:
       tags: ["photos"]
       summary: Get photos
-      description: Get the user photos
+      description: Get the photos posted by the user
       operationId: getUserPhotos
       responses:
         "200":
@@ -319,20 +312,22 @@ paths:
       operationId: deletePhoto
       responses:
         "204":
-          description: Your photo has been deleted
+          $ref: "#/components/responses/No content"
         "400": 
           $ref: "#/components/responses/BadRequest" 
         "401": 
           $ref: '#/components/responses/Unauthorized'
         "500": 
            $ref: "#/components/responses/InternalServerError" 
-  /users/{idUser}/posts/{idPhoto}/comments: # TODO GET
+  /users/{idUser}/posts/{idPhoto}/comments:
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idPhoto"
     post:
       tags: ["comments"]
       summary: Post a comment
+      description: | 
+        Post a comment on another user's post or even himself
       operationId: commentPhoto
       requestBody:
         description: The caption of the comment
@@ -345,8 +340,8 @@ paths:
                 caption:
                   $ref: "#/components/schemas/Comment/properties/caption"
       responses:
-        "200":
-          $ref: "#/components/responses/OK" 
+        "201":
+          $ref: "#/components/responses/Created" 
         "400": 
           $ref: "#/components/responses/BadRequest" 
         "401": 
@@ -377,6 +372,8 @@ paths:
     delete:
       tags: ["comments"]
       summary: Delete a comment
+      description: |
+        Delete the comment under another user's post (it can also be the same user)
       operationId: uncommentPhoto
       responses:
         "200":
@@ -387,7 +384,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         "500": 
            $ref: "#/components/responses/InternalServerError"
-  /users/{idUser}/posts/{idPhoto}/likes: # TODO GET
+  /users/{idUser}/posts/{idPhoto}/likes: 
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idPhoto"
@@ -559,7 +556,7 @@ components:
           $ref: "#/components/schemas/DateTime"
         caption:
           type: string
-          pattern: 'ˆ\S+$'
+          pattern: '\S.+'
           example: Wow!!!
           minLength: 1
           maxLength: 200
@@ -593,8 +590,8 @@ components:
       properties:
         error:
           type: string
-          pattern: 'ˆ\S.+$'
-          example: The username is already taken
+          pattern: '\S.+'
+          example: Username is already taken
           minLength: 0
           maxLength: 200
 
@@ -708,17 +705,6 @@ components:
       content:
         application/json:
           schema: 
-            type: object
-            description: The message of the error
-            properties:
-              err:
-                $ref: "#/components/schemas/Message"
-    NotAcceptable:  # 406
-      description: |
-        The server is unable to provide a response that matches the client's requested format
-      content:
-        application/json:
-          schema:
             type: object
             description: The message of the error
             properties:
