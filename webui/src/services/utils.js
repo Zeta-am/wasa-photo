@@ -28,23 +28,19 @@ utils.since = (timestamp) => {
 utils.errorToString = (error) => {
     console.log(error);
     if (error.hasOwnProperty('response')) {
-        return error.response.data;
+        return error.response.data;1
     } else {
         return error.toString();
     }
 }
 
-utils.setAuth = () => {
-    instance.defaults.headers.common['Authorization'] = 'Bearer ' + getCurrentId()
-}
-
 
 utils.getCurrentId = () => {
-    return localStorage["token"]
+    return localStorage["token"] || null
 }
 
 utils.getCurrentUsername = () => {
-    return localStorage["username"]
+    return localStorage["username"] || null
 }
 
 export default utils

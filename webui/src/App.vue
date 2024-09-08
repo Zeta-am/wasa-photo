@@ -2,7 +2,47 @@
 import { RouterLink, RouterView } from 'vue-router'
 </script>
 <script>
-export default {}
+export default {
+	data: function() {
+		return {
+			logged: null,
+			currentUsername: null,
+			usrLink: null,
+		}
+	},
+	watch: {
+		$route (to, from) {
+			this.logged = this.$utils.getCurrentId();
+			this.currentUsername = this.$utils.getCurrentUsername();
+			this.usrLink = "/users/" + this.currentUsername;
+		}
+	},
+	methods: {
+		logout() {
+			localStorage.removeItem("token");
+			localStorage.removeItem("username");
+			this.$setAuth();
+			this.$router.push({name: 'Login'})
+		}
+	},
+	mounted() {
+		this.$setAuth();
+
+		this.usrLink = "/users/" + this.$utils.getCurrentUsername();
+
+		this.$axios.interceptors.response.use(response => {
+			return response;
+		}, error => {
+				// If the user is Unauthorized, redirect to login
+			if (error.response.status === 401) {
+				this.$router.push({ name: 'Login' })
+				return;
+			}
+			else 
+				return Promise.reject(error) // Leave other error handlers
+		});
+	}
+}
 </script>
 
 <template>
@@ -77,7 +117,7 @@ export default {}
 								</RouterLink>
 							</li>
 							<li class="nav-item">
-								<RouterLink :to="userLink" class="nav-link">
+								<RouterLink :to="usrLink" class="nav-link">
 									<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#user"/></svg>
 									Profile
 								</RouterLink>
