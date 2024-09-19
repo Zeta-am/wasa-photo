@@ -2,7 +2,6 @@ package database
 
 import "github.com/Zeta-am/wasa-photo/service/utils"
 
-
 func (db *appdbimpl) FollowUser(uid int, followedId int) (int, error) {
 	_, err := db.c.Exec(`INSERT
 							INTO follows (follower_id, followed_id)
@@ -10,7 +9,7 @@ func (db *appdbimpl) FollowUser(uid int, followedId int) (int, error) {
 	res := checkResults(err)
 	if res != SUCCESS {
 		return res, err
-	} 
+	}
 	return res, nil
 }
 
@@ -21,8 +20,8 @@ func (db *appdbimpl) UnfollowUser(uid int, unfollowedId int) (int, error) {
 	res := checkResults(err)
 	if res != SUCCESS {
 		return res, err
-	} 
-return res, nil 			
+	}
+	return res, nil
 }
 
 func (db *appdbimpl) GetListFollowers(uid int) ([]utils.User, int, error) {

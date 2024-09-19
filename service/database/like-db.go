@@ -32,10 +32,10 @@ func (db *appdbimpl) GetLikes(uid int, pid int) ([]utils.Like, int, error) {
 	if res := checkResults(err); res != SUCCESS {
 		return nil, res, err
 	}
-	defer func ()  {
+	defer func() {
 		if errow := rows.Close(); errow != nil {
 			err = errow
-		}	
+		}
 	}()
 	var likes []utils.Like
 	for rows.Next() {

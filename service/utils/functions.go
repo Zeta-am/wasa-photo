@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
-
 )
 
 func GetAuthorization(w http.ResponseWriter, r *http.Request) (int, error) {
@@ -13,7 +12,7 @@ func GetAuthorization(w http.ResponseWriter, r *http.Request) (int, error) {
 	if err != nil {
 		return 0, nil
 	}
-	return auth, nil	
+	return auth, nil
 }
 
 func ValidateUsername(username string) error {

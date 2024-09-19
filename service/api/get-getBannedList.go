@@ -28,7 +28,7 @@ func (rt *_router) getBannedList(w http.ResponseWriter, r *http.Request, ps http
 
 	// Get the list of user banned
 	users, res, err := rt.db.GetBannedList(uid)
-	if res == database.ERROR || err != nil{
+	if res == database.ERROR || err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -39,5 +39,5 @@ func (rt *_router) getBannedList(w http.ResponseWriter, r *http.Request, ps http
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	}	
-}	
+	}
+}

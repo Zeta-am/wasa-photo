@@ -58,7 +58,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	case database.ERROR:
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return	
+		return
 	}
 
 	// Encode the response

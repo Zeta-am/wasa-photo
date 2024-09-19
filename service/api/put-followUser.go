@@ -54,11 +54,11 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		http.Error(w, "access denied. You cannot perform this action because the user is banned.", http.StatusForbidden)
 		return
 	}
-	
-	// Follow the user 
+
+	// Follow the user
 	res, err := rt.db.FollowUser(uid, followUid)
 	switch res {
-	case database.UNIQUE_FAILED:	// The user was already followed
+	case database.UNIQUE_FAILED: // The user was already followed
 		w.WriteHeader(http.StatusOK)
 		return
 	case database.NO_ROWS:
@@ -69,7 +69,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	// Return the followed user 
+	// Return the followed user
 	user, res, err := rt.db.GetUserById(followUid)
 
 	// Check for errors
@@ -88,5 +88,5 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	}	
+	}
 }

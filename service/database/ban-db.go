@@ -12,7 +12,7 @@ func (db *appdbimpl) BanUser(uid int, bannedId int) (int, error) {
 	// Ban the user
 	_, err = tx.Exec(`INSERT
 						INTO bans (user_id, banned_id)
-						VALUES (?, ?)`, uid, bannedId)					
+						VALUES (?, ?)`, uid, bannedId)
 	res := checkResults(err)
 	if res != SUCCESS {
 		erro := tx.Rollback()
@@ -59,15 +59,14 @@ func (db *appdbimpl) UnbanUser(uid int, unbannedId int) (int, error) {
 	return SUCCESS, nil
 }
 
-
 // Check if uid is banned by bannerId
 func (db *appdbimpl) IsBanned(uid int, bannerId int) (bool, int, error) {
-	var value int 
+	var value int
 	err := db.c.QueryRow(`SELECT EXISTS(
 							SELECT 1
 							FROM bans
 							WHERE user_id = ? AND banned_id = ?)`, bannerId, uid).Scan(&value)
-	if res := checkResults(err); res != SUCCESS || value == 0{
+	if res := checkResults(err); res != SUCCESS || value == 0 {
 		return false, res, err
 	}
 	return true, SUCCESS, nil

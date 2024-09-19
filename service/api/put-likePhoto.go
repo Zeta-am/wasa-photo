@@ -48,7 +48,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	banned, _, err := rt.db.IsBanned(uid, post.UserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return 
+		return
 	}
 	if banned {
 		http.Error(w, "access denied. You cannot perform this action because the user is banned.", http.StatusForbidden)
@@ -60,7 +60,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	switch res {
 	case database.SUCCESS:
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(like)
+		err = json.NewEncoder(w).Encode(like)
 		if err != nil {
 			http.Error(w, "can't enconde the response: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -71,7 +71,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	case database.UNIQUE_FAILED:
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(like)
+		err = json.NewEncoder(w).Encode(like)
 		if err != nil {
 			http.Error(w, "can't enconde the response: "+err.Error(), http.StatusInternalServerError)
 			return
@@ -81,5 +81,5 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
+
 }

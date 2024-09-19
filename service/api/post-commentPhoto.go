@@ -42,14 +42,14 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	} else if res == database.ERROR {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return						
+		return
 	}
 
 	// TODO: Check that the user who posted the photo has not banned the user who wants to comment
 	banned, _, err := rt.db.IsBanned(uid, post.UserID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return 
+		return
 	}
 	if banned {
 		http.Error(w, "access denied. You cannot perform this action because the user is banned.", http.StatusForbidden)
@@ -63,7 +63,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	// Fill the comment object 
+	// Fill the comment object
 	comm.PostID = pid
 	comm.UserID = uid
 	comm.Timestamp = time.Now().Format(time.RFC3339)

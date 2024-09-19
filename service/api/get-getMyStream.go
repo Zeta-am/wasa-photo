@@ -30,7 +30,7 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	stream, res, err := rt.db.GetMyStream(uid)
 	if res == database.ERROR {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return	
+		return
 	}
 
 	// Send the response

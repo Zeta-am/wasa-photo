@@ -35,13 +35,13 @@ func checkResults(err error) int {
 func getUsers(rows *sql.Rows) ([]utils.User, int, error) {
 	var err error = nil
 	var users []utils.User
-	defer func ()  {
+	defer func() {
 		if closeErr := rows.Close(); closeErr != nil {
 			err = closeErr
-		}	
+		}
 	}()
-	
-	// Get the user_id and username from the rows selected	
+
+	// Get the user_id and username from the rows selected
 	for rows.Next() {
 		var usr utils.User
 		if err = rows.Scan(&usr.UserID, &usr.Username); err != nil {

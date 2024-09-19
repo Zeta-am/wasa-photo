@@ -11,7 +11,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-
 func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("Content-type", "application/json")
 
@@ -43,7 +42,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// The like that has been removed
-	var like = utils.Like {
+	var like = utils.Like{
 		UserID: uid,
 		PostID: pid,
 	}

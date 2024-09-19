@@ -1,7 +1,7 @@
 package api
 
 import (
-	"encoding/json"	
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -9,7 +9,6 @@ import (
 	"github.com/Zeta-am/wasa-photo/service/database"
 	"github.com/julienschmidt/httprouter"
 )
-
 
 func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("Content-type", "application/json")
@@ -41,7 +40,7 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	} else if res == database.ERROR {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return						
+		return
 	}
 
 	// Delete the photo
@@ -60,7 +59,7 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	err = json.NewEncoder(w).Encode(post)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	return		
+		return
 	}
 	ctx.Logger.Info("Post deleted")
 }

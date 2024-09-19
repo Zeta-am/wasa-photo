@@ -2,11 +2,11 @@ package api
 
 import (
 	"github.com/Zeta-am/wasa-photo/service/api/reqcontext"
+	"github.com/Zeta-am/wasa-photo/service/utils"
 	"github.com/gofrs/uuid"
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 	"net/http"
-	"github.com/Zeta-am/wasa-photo/service/utils"
 )
 
 // httpRouterHandler is the signature for functions that accepts a reqcontext.RequestContext in addition to those
@@ -35,11 +35,11 @@ func (rt *_router) wrap(fn httpRouterHandler, auth bool) func(http.ResponseWrite
 				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
 			}
-		}	
-				
+		}
+
 		var ctx = reqcontext.RequestContext{
 			ReqUUID: reqUUID,
-			UserID: uid,
+			UserID:  uid,
 		}
 		// Create a request-specific logger
 		ctx.Logger = rt.baseLogger.WithFields(logrus.Fields{

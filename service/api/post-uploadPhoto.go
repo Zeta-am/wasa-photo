@@ -17,7 +17,7 @@ import (
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("Content-type", "application/json")
 
-	var post utils.Post		// The post that will be created
+	var post utils.Post // The post that will be created
 
 	//Get the uid from the url
 	uid, err := strconv.Atoi(ps.ByName("idUser"))
@@ -34,12 +34,12 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	post.UserID = uid
 
 	// Encode the request body as a multipart/form-data
-	err = r.ParseMultipartForm(20 << 20)	// Max 20 MiB
+	err = r.ParseMultipartForm(20 << 20) // Max 20 MiB
 	if err != nil {
 		http.Error(w, "the photo exceeds the maximum length", http.StatusBadRequest)
 		return
 	}
-	
+
 	// Takes the caption from the URL
 	post.Caption = r.URL.Query().Get("caption")
 	if len(post.Caption) > 200 {
@@ -69,7 +69,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	pid, res, err := rt.db.CreatePost(post)
 
 	// Check for errors
-	if res == database.ERROR {		
+	if res == database.ERROR {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -88,6 +88,6 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		ctx.Logger.WithError(err).Error("error encoding the response")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	}		
+	}
 	ctx.Logger.Info("Post uploaded")
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext	.RequestContext) {
+func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("Content-type", "application/json")
 
 	// Get the user id from the URL
@@ -41,7 +41,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	} else if res == database.ERROR {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return						
+		return
 	}
 
 	// Get the id of the comments
@@ -64,10 +64,10 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 
 	// Encode the deleted comment
 	w.WriteHeader(http.StatusOK)
-	var delComm = utils.Comment {
+	var delComm = utils.Comment{
 		CommentID: cid,
-		PostID: pid,
-		UserID: uid,
+		PostID:    pid,
+		UserID:    uid,
 	}
 	err = json.NewEncoder(w).Encode(delComm)
 	if err != nil {

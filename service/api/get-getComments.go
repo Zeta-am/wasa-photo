@@ -30,7 +30,7 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 	pid, err := strconv.Atoi(ps.ByName("idPhoto"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		return 
+		return
 	}
 
 	// Get the comments from database

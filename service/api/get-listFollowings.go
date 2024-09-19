@@ -10,8 +10,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-
- func (rt *_router) listFollowings(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) listFollowings(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("Content-type", "application/json")
 
 	// Get uid from the url
@@ -19,7 +18,7 @@ import (
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
-	}	
+	}
 
 	// Check if the ID of the path is equal to the ID of the authorization
 	if uid != ctx.UserID {
@@ -29,7 +28,7 @@ import (
 
 	// Get the list of the followers from the database
 	followers, res, err := rt.db.GetListFollowings(uid)
-	if res == database.ERROR || err != nil{
+	if res == database.ERROR || err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -41,4 +40,4 @@ import (
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
- }
+}

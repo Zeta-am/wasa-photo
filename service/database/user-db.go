@@ -3,11 +3,10 @@ package database
 import (
 	"database/sql"
 
-	"github.com/Zeta-am/wasa-photo/service/utils"		
+	"github.com/Zeta-am/wasa-photo/service/utils"
 )
 
-
-var GET_USER_STREAM =  `SELECT
+var GET_USER_STREAM = `SELECT
 							p.*, 
 							u.username,
 							COUNT(DISTINCT l.post_id) AS like_count,
@@ -22,7 +21,7 @@ var GET_USER_STREAM =  `SELECT
 						GROUP BY p.post_id
 						ORDER BY p.timestamp DESC;
 `
-						
+
 func (db *appdbimpl) GetUserByName(username string) (utils.User, int, error) {
 	var user utils.User
 	err := db.c.QueryRow(`SELECT user_id, username 
@@ -45,7 +44,7 @@ func (db *appdbimpl) GetUserById(id int) (utils.User, int, error) {
 	res := checkResults(err)
 	if res != SUCCESS {
 		return utils.User{}, res, err
-	}			
+	}
 	return db.fillUser(user)
 }
 
@@ -62,7 +61,7 @@ func (db *appdbimpl) IsUsernameExists(username string) (bool, int, error) {
 		return false, res, err
 	}
 	return true, res, nil
-} 
+}
 
 func (db *appdbimpl) CreateUser(u utils.User) (utils.User, int, error) {
 	_, err := db.c.Exec(`INSERT 
@@ -117,7 +116,7 @@ func (db *appdbimpl) fillUser(u utils.User) (utils.User, int, error) {
 	// Fill FollowerCount field
 	err := db.c.QueryRow(`SELECT COUNT(*)
 						FROM follows
-						WHERE followed_id = ?`, u.UserID).Scan(&u.FollowerCount)	
+						WHERE followed_id = ?`, u.UserID).Scan(&u.FollowerCount)
 	if err != nil {
 		return utils.User{}, ERROR, err
 	}
@@ -141,7 +140,6 @@ func (db *appdbimpl) fillUser(u utils.User) (utils.User, int, error) {
 	return u, SUCCESS, nil
 }
 
-
 func (db *appdbimpl) SetMyUsername(username string, uid int) (int, error) {
 	_, err := db.c.Exec(`UPDATE users
 							SET username = ?
@@ -153,16 +151,16 @@ func (db *appdbimpl) SetMyUsername(username string, uid int) (int, error) {
 }
 
 func (db *appdbimpl) GetMyStream(uid int) ([]utils.Post, int, error) {
-	rows, err := db.c.Query(GET_USER_STREAM, uid	, uid)
+	rows, err := db.c.Query(GET_USER_STREAM, uid, uid)
 	if err != nil {
 		return nil, ERROR, err
-	} 
-	defer func ()  {
+	}
+	defer func() {
 		if closeErr := rows.Close(); closeErr != nil {
 			err = closeErr
 		}
-		} ()
-	
+	}()
+
 	var stream []utils.Post
 	for rows.Next() {
 		var post utils.Post
@@ -180,7 +178,7 @@ func (db *appdbimpl) GetMyStream(uid int) ([]utils.Post, int, error) {
 
 	return stream, SUCCESS, nil
 }
- 
+
 func (db *appdbimpl) GetUserPhotos(uid int) ([]utils.Post, int, error) {
 	rows, err := db.c.Query(`SELECT p.*,
 									COUNT(DISTINCT l.post_id) AS like_count,
@@ -195,11 +193,11 @@ func (db *appdbimpl) GetUserPhotos(uid int) ([]utils.Post, int, error) {
 		return nil, ERROR, err
 	}
 
-	defer func ()  {
+	defer func() {
 		if errow := rows.Close(); errow != nil {
 			err = errow
 		}
-	} ()
+	}()
 
 	var posts []utils.Post
 	for rows.Next() {
@@ -214,4 +212,3 @@ func (db *appdbimpl) GetUserPhotos(uid int) ([]utils.Post, int, error) {
 	}
 	return posts, SUCCESS, nil
 }
-

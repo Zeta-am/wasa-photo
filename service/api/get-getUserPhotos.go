@@ -12,7 +12,7 @@ import (
 
 func (rt *_router) getUserPhotos(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("Content-type", "application/json")
-	
+
 	// Get the uid from the url
 	uid, err := strconv.Atoi(ps.ByName("idUser"))
 	if err != nil {
@@ -37,8 +37,7 @@ func (rt *_router) getUserPhotos(w http.ResponseWriter, r *http.Request, ps http
 	w.WriteHeader(http.StatusOK)
 	if err = json.NewEncoder(w).Encode(posts); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return 
+		return
 	}
-	
 
 }

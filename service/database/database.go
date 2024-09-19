@@ -35,7 +35,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Zeta-am/wasa-photo/service/utils"	
+	"github.com/Zeta-am/wasa-photo/service/utils"
 )
 
 // AppDatabase is the high level interface for the DB
@@ -84,7 +84,7 @@ type appdbimpl struct {
 	c *sql.DB
 }
 
-// Check if a table exists, if not create it 
+// Check if a table exists, if not create it
 func CheckAndCreateTable(db *sql.DB, tableName string, createStmt string) error {
 	_, err := db.Exec(createStmt)
 	if err != nil {
@@ -185,7 +185,6 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 	return &appdbimpl{c: db}, nil
 }
-
 
 func (db *appdbimpl) Ping() error {
 	return db.c.Ping()

@@ -30,11 +30,11 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 	pid, err := strconv.Atoi(ps.ByName("idPhoto"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		return 
+		return
 	}
 
 	// Get likes from the database
-	likes, res, err := rt.db.GetLikes(uid, pid	)
+	likes, res, err := rt.db.GetLikes(uid, pid)
 	if res == database.ERROR {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -44,7 +44,7 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 	w.WriteHeader(http.StatusOK)
 	if err = json.NewEncoder(w).Encode(likes); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-	return		
+		return
 	}
-	
+
 }

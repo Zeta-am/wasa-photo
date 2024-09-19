@@ -42,7 +42,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	// Ban the user
 	res, err := rt.db.BanUser(uid, banId)
 	switch res {
-	case database.UNIQUE_FAILED:	// The user was already banned
+	case database.UNIQUE_FAILED: // The user was already banned
 		w.WriteHeader(http.StatusOK)
 		return
 	case database.NO_ROWS:
@@ -53,7 +53,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	// Return the followed user 
+	// Return the followed user
 	user, res, err := rt.db.GetUserById(banId)
 
 	// Check for errors

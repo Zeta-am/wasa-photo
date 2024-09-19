@@ -10,21 +10,21 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (rt *_router) unfollowUser (w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	w.Header().Set("Content-type", "application/json")
 
-// Get the user id from the URL
-uid, err := strconv.Atoi(ps.ByName("idUser"))
-if err != nil {
-	http.Error(w, err.Error(), http.StatusBadRequest)
-	return
-}
+	// Get the user id from the URL
+	uid, err := strconv.Atoi(ps.ByName("idUser"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-// Check if the user is authorized
-if uid != ctx.UserID {
-	http.Error(w, "Unauthorized", http.StatusUnauthorized)
-	return
-}
+	// Check if the user is authorized
+	if uid != ctx.UserID {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 
 	// Get the user id you want to follow
 	unfollowUid, err := strconv.Atoi(ps.ByName("idFollowed"))
@@ -44,7 +44,7 @@ if uid != ctx.UserID {
 		return
 	}
 
-	// Return the followed user 
+	// Return the followed user
 	user, res, err := rt.db.GetUserById(unfollowUid)
 
 	// Check for errors
@@ -64,5 +64,5 @@ if uid != ctx.UserID {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
+
 }

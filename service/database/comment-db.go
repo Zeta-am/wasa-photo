@@ -11,7 +11,7 @@ func (db *appdbimpl) CreateComment(c utils.Comment) (int, int, error) {
 	if res := checkResults(err); res != SUCCESS {
 		return cid, res, err
 	}
-	return cid, SUCCESS, nil	
+	return cid, SUCCESS, nil
 }
 
 func (db *appdbimpl) DeleteComment(cid int, pid int, uid int) (int, error) {
@@ -31,10 +31,10 @@ func (db *appdbimpl) GetComments(uid int, pid int) ([]utils.Comment, int, error)
 	if res := checkResults(err); res != SUCCESS {
 		return nil, res, err
 	}
-	defer func ()  {
+	defer func() {
 		if errow := rows.Close(); errow != nil {
 			err = errow
-		}	
+		}
 	}()
 	var comms []utils.Comment
 	for rows.Next() {
@@ -49,4 +49,3 @@ func (db *appdbimpl) GetComments(uid int, pid int) ([]utils.Comment, int, error)
 	}
 	return comms, SUCCESS, nil
 }
-	
