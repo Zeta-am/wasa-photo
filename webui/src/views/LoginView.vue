@@ -26,7 +26,6 @@ export default {
                     this.$router.push({name: 'Home'});
                 }
             } catch(e) {
-                console.log(e)
                 const response = e.response;
                 if (response) {
                     if (response.status == 400) {
@@ -52,26 +51,6 @@ export default {
 </script>
 
 <template>
-    <!-- <div class="form-body">
-        <div style="max-width: 100vh;" class="form-inner">
-            <div class="mb-3">
-                <h1>WASAPhoto Login</h1>
-            </div>
-			<div style="font-size: 1.3rem;">
-				<div class="form-group mb-3">
-					<input style="text-align: center;" v-model="username" id="Username" type="text" class="form-control" placeholder="Type username...">
-				</div>
-				<button style="font-size:1.2rem;" class="profile-buttons profile-buttons-primary" type="button" @click="doLogin">
-					<svg style="margin-left: 2px;" class="feather"><use href="/feather-sprite-v4.29.0.svg#log-in"/></svg>
-					Login
-				</button>
-			</div>
-			<div v-if="errorMsg" >
-				<hr>
-				<ErrorMsg :msg="errorMsg"></ErrorMsg>
-			</div>
-        </div>
-    </div> -->
     <div class="form-body">
         <div class="form-inner">
             <!-- Title or image -->

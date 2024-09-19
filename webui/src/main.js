@@ -18,6 +18,7 @@ app.config.globalProperties.$setAuth = setAuth;
 // Components
 app.component("ErrorMsg", ErrorMsg);
 app.component("LoadingSpinner", LoadingSpinner);
+//app.component("PostModal", PostModal);
 
 
 app.use(router)

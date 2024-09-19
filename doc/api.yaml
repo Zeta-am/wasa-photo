@@ -46,7 +46,12 @@ paths:
       operationId: getUserProfile
       responses:
         "200":
-          $ref: "#/components/responses/OK"
+          description: Profile returned
+          content:
+            application/json:
+              schema: 
+                description: The profile of the user
+                type: object
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -269,13 +274,21 @@ paths:
           description: Optional description
           required: true
           schema:
-            $ref: "#/components/schemas/Message"
+            description: The caption of the post
+            type: object
+            properties:
+              caption:
+                $ref: "#/components/schemas/Message"
       requestBody:
         description: The binary image file of the photo
         content:
           image/*:    # Accept all type of images
             schema:
-              $ref: "#/components/schemas/Image"
+              description: The image
+              type: object
+              properties:
+                image:
+                  $ref: "#/components/schemas/Image"
       responses:
         "201":
           $ref: "#/components/responses/Created"
