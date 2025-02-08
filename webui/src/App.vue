@@ -12,9 +12,7 @@ export default {
 	},
 	watch: {
 		$route (to, from) {
-			this.logged = this.$utils.getCurrentId();
-			this.currentUsername = this.$utils.getCurrentUsername();
-			this.usrLink = "/users/" + this.currentUsername;
+			this.checkLocalStorage();
 		}
 	},
 	methods: {
@@ -23,12 +21,29 @@ export default {
 			localStorage.removeItem("username");
 			this.$setAuth();
 			this.$router.push({name: 'Login'})
+		},
+		checkLocalStorage() {
+			const storedUsr = localStorage.getItem('username');
+			const storedTkn = localStorage.getItem('token');
+
+			if (storedUsr && storedTkn) {
+				try {
+					this.currentUsername = storedUsr;
+					this.logged = true;
+					this.usrLink = "/users/" + this.currentUsername;
+				} catch (error) {
+					localStorage.removeItem('username');
+					localStorage.removeItem('token');
+					this.logged = false
+				}
+			} else {
+				this.logged = false;
+			}
 		}
 	},
 	mounted() {
 		this.$setAuth();
-
-		this.usrLink = "/users/" + this.$utils.getCurrentUsername();
+		this.checkLocalStorage();
 
 		this.$axios.interceptors.response.use(response => {
 			return response;

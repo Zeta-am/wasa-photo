@@ -64,14 +64,19 @@ func (db *appdbimpl) IsUsernameExists(username string) (bool, int, error) {
 }
 
 func (db *appdbimpl) CreateUser(u utils.User) (utils.User, int, error) {
-	_, err := db.c.Exec(`INSERT 
+	res, err := db.c.Exec(`INSERT 
 								INTO users (username, user_name, user_surname) 
 								VALUES (?, ?, ?);`, u.Username, u.Name, u.Surname)
-	res := checkResults(err)
-	if res != SUCCESS {
-		return utils.User{}, res, err
+	if err != nil {
+		return utils.User{}, checkResults(err), err
 	}
-	return u, res, nil
+	// Retrieve the userId
+	usrId, err := res.LastInsertId()
+	if err != nil {
+		return utils.User{}, checkResults(err), err
+	}
+	u.UserID = int(usrId)
+	return u, SUCCESS, nil
 }
 
 func (db *appdbimpl) GetUserProfile(userId int) (utils.User, int, error) {
