@@ -52,6 +52,9 @@ paths:
               schema: 
                 description: The profile of the user
                 type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -71,7 +74,17 @@ paths:
       operationId: getMyStream
       responses:
         "200": 
-          $ref: "#/components/responses/OK" 
+          description: Stream returned
+          content:
+            application/json:
+              schema:
+                description: The stream of the user
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -91,7 +104,17 @@ paths:
         This method allow to list all the followers of the specified user
       responses:
         "200":  
-          $ref: "#/components/responses/OK" 
+          description: Followers returned
+          content:
+            application/json:
+              schema:
+                description: The list of followers
+                type: object
+                properties:
+                  followers:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User" 
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -111,7 +134,17 @@ paths:
       operationId: listFollowings
       responses:
         "200": 
-          $ref: "#/components/responses/OK" 
+          description: Following returned
+          content:
+            application/json:
+              schema:
+                description: The list of following
+                type: object
+                properties:
+                  followings:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User"
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -210,7 +243,17 @@ paths:
       description: Gets the list of all users banned by the user idUser
       responses:
         "200":
-          $ref: "#/components/responses/OK"
+          description: Banned list returned
+          content:
+            application/json:
+              schema:
+                description: The list of banned users
+                type: object
+                properties:
+                  banned:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User"
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -298,22 +341,32 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         "500":
           $ref: "#/components/responses/InternalServerError" 
-    # get:
-    #   tags: ["photos"]
-    #   summary: Get photos
-    #   description: Get the photos posted by the user
-    #   operationId: getUserPhotos
-    #   responses:
-    #     "200":
-    #       $ref: "#/components/responses/OK"
-    #     "400":
-    #       $ref: "#/components/responses/BadRequest"
-    #     "401": 
-    #       $ref: '#/components/responses/Unauthorized'
-    #     "404": 
-    #       $ref: "#/components/responses/NotFound" 
-    #     "500":
-    #       $ref: "#/components/responses/InternalServerError"
+    get:
+      tags: ["photos"]
+      summary: Get photos
+      description: Get the photos posted by the user
+      operationId: getUserPhotos
+      responses:
+        "200":
+          description: Photos of the user returned
+          content:
+            application/json:
+              schema:
+                description: The list of photos of the user
+                type: object
+                properties:
+                  photos:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Post"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
+        "404": 
+          $ref: "#/components/responses/NotFound" 
+        "500":
+          $ref: "#/components/responses/InternalServerError"
   /users/{idUser}/posts/{idPhoto}:
     parameters:
       - $ref: "#/components/parameters/idUser"
@@ -370,7 +423,17 @@ paths:
       operationId: getComments
       responses:
         "200":
-          $ref: "#/components/responses/OK"
+          description: Comments returned
+          content:
+            application/json:
+              schema:
+                description: The list of comments
+                type: object
+                properties:
+                  comments:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Comment"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -442,7 +505,17 @@ paths:
       operationId: getLikes
       responses:
         "200":
-          $ref: "#/components/responses/OK"
+          description: Likes returned
+          content:
+            application/json:
+              schema:
+                description: The list of likes
+                type: object
+                properties:
+                  likes:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401": 
@@ -573,16 +646,6 @@ components:
           example: Wow!!!
           minLength: 1
           maxLength: 200
-    Like:
-      title: Like
-      description: This schema represent a like on a photo
-      type: object
-      readOnly: true
-      properties:
-        userId:
-          $ref: "#/components/schemas/User/properties/id"
-        photoId:
-          $ref: "#/components/schemas/Post/properties/id"
     DateTime:
       title: DateTime
       description: This object reperesents the date and time
