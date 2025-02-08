@@ -38,8 +38,5 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE("/users/:idUser/banList/:idUserBlocked", rt.wrap(rt.unbanUser, true))
 	rt.router.GET("/users/:idUser/banList", rt.wrap(rt.getBannedList, true))
 
-	// Special routes
-	rt.router.GET("/liveness", rt.liveness)
-
 	return rt.router
 }

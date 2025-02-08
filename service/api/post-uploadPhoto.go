@@ -19,7 +19,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	var post utils.Post // The post that will be created
 
-	//Get the uid from the url
+	// Get the uid from the url
 	uid, err := strconv.Atoi(ps.ByName("idUser"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

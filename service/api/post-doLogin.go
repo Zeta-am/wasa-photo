@@ -61,5 +61,4 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	ctx.Logger.Info("Login successful")
 }
