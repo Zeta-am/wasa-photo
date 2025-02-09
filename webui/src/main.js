@@ -5,6 +5,10 @@ import {setAuth, axios} from './services/axios.js';
 import utils from './services/utils.js';
 import ErrorMsg from './components/ErrorMsg.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
+import PhotoGrid from './components/PhotoGrid.vue';
+import UserInfo from './components/UserInfo.vue';
+import ChangeUsernameForm from './components/ChangeUsernameForm.vue';
+
 
 import './assets/dashboard.css'
 import './assets/main.css'
@@ -18,7 +22,9 @@ app.config.globalProperties.$setAuth = setAuth;
 // Components
 app.component("ErrorMsg", ErrorMsg);
 app.component("LoadingSpinner", LoadingSpinner);
-//app.component("PostModal", PostModal);
+app.component("PhotoGrid", PhotoGrid);
+app.component("UserInfo", UserInfo);
+app.component("ChangeUsernameForm", ChangeUsernameForm);
 
 
 app.use(router)

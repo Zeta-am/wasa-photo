@@ -20,8 +20,9 @@ export default {
 
                 if (response.status == 200 || response.status == 201) {
                     this.userId = response.data.id;
-                    localStorage.setItem('token', JSON.stringify(this.userId));
-                    localStorage.setItem('username', this.username)
+                    // Save raw token without JSON.stringify
+                    localStorage.setItem('token', this.userId);
+                    localStorage.setItem('username', this.username);
                     this.$setAuth();
                     this.$router.push({name: 'Home'});
                 }
