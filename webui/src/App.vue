@@ -1,11 +1,13 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import Dashboard from '@/components/Dashboard.vue'
+import UploadPhotoModal from '@/components/UploadPhotoModal.vue'
 </script>
 <script>
 export default {
   components: {
-    Dashboard
+    Dashboard,
+    UploadPhotoModal
   },
 	data: function() {
 		return {
@@ -21,14 +23,14 @@ export default {
 	},
 	methods: {
 		logout() {
-			localStorage.removeItem("token");
-			localStorage.removeItem("username");
+			window.localStorage.removeItem("token");
+			window.localStorage.removeItem("username");
 			this.$setAuth();
 			this.$router.push({name: 'Login'})
 		},
 		checkLocalStorage() {
-			const storedUsr = localStorage.getItem('username');
-			const storedTkn = localStorage.getItem('token');
+			const storedUsr = window.localStorage.getItem('username');
+			const storedTkn = window.localStorage.getItem('token');
 
 			if (storedUsr && storedTkn) {
 				try {
@@ -41,7 +43,19 @@ export default {
 			} else {
 				this.logged = false;
 			}
-		}
+		},
+		handleLogout() {
+			window.localStorage.removeItem('token');
+			window.localStorage.removeItem('username');
+			this.logged = false;
+			this.currentUsername = null;
+			this.usrLink = null;
+			this.$setAuth();
+			this.$router.push({ name: 'Login' });
+		},
+    openUploadModal() {
+      this.$refs.uploadModal.open()
+    }
 	},
 	mounted() {
 		this.$setAuth();
@@ -63,35 +77,31 @@ export default {
 </script>
 
 <template>
-  <div class="container-fluid">
-    <div class="row g-0">
-      <Dashboard 
-        v-if="logged"
-        :username="currentUsername" 
-        :usrLink="`/users/${localStorage.getItem('token')}`"
-        @logout="logout"
-        class="col-md-3 col-lg-2 d-md-block"
-      />
-      <main :class="[
-        logged ? 'col-md-9 ms-sm-auto col-lg-10' : 'col-12',
-        'px-md-4'
-      ]">
-        <RouterView />
-      </main>
-    </div>
+  <div class="container-fluid h-100">
+    <Dashboard 
+      v-if="logged"
+      :username="currentUsername" 
+      :usrLink="usrLink"
+      @logout="logout"
+      @open-upload="openUploadModal"
+    />
+    <main :class="['px-md-4', 'w-100']">
+      <RouterView />
+    </main>
+    <UploadPhotoModal ref="uploadModal" />
   </div>
 </template>
 
 <style>
-#app {
-  min-height: 100vh;
+html, body, #app {
+  height: 100%;
 }
 
 .container-fluid {
   padding: 0;
 }
 
-.min-vh-100 {
+main {
   min-height: 100vh;
 }
 </style>

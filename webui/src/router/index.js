@@ -32,8 +32,20 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth && !localStorage.token) {
+  const token = localStorage.getItem('token')
+  const username = localStorage.getItem('username')
+  
+  // Require both token and username for auth
+  const isAuthenticated = token && username
+  
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    // Clear potentially corrupt storage
+    localStorage.removeItem('token')
+    localStorage.removeItem('username')
     next({ name: 'Login' })
+  } else if (to.name === 'Login' && isAuthenticated) {
+    // Redirect to home if already logged in
+    next({ name: 'Home' })
   } else {
     next()
   }

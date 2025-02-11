@@ -7,12 +7,8 @@ import ErrorMsg from './components/ErrorMsg.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
 import PhotoGrid from './components/PhotoGrid.vue';
 import UserInfo from './components/UserInfo.vue';
-import ChangeUsernameForm from './components/ChangeUsernameForm.vue';
-
-
-import './assets/dashboard.css'
-import './assets/main.css'
-
+import ChangeUsernameForm from './components/ChangeUsernameModal.vue';
+import UploadPhotoModal from './components/UploadPhotoModal.vue'
 
 const app = createApp(App)
 app.config.globalProperties.$axios = axios;
@@ -25,7 +21,7 @@ app.component("LoadingSpinner", LoadingSpinner);
 app.component("PhotoGrid", PhotoGrid);
 app.component("UserInfo", UserInfo);
 app.component("ChangeUsernameForm", ChangeUsernameForm);
-
+app.component("UploadPhotoModal", UploadPhotoModal)
 
 app.use(router)
 app.mount('#app')

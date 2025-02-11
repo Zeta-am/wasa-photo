@@ -63,6 +63,41 @@ paths:
           $ref: '#/components/responses/NotFound'
         "500":
           $ref: '#/components/responses/InternalServerError'
+    put:
+      tags: ["users"]
+      summary: Change the username
+      description: Set a new username
+      operationId: setMyUserName
+      requestBody:
+        description: The new username
+        content:
+          application/json:
+            schema:
+              description: The new username
+              type: object
+              properties:
+                username:
+                  $ref: "#/components/schemas/Username"
+        required: true
+      responses:
+        "200":
+          description: Username updated
+          content:
+            application/json:
+              schema:
+                description: The new username
+                type: object
+                properties:
+                  username:
+                    $ref: "#/components/schemas/Username"
+        "400": 
+          $ref: '#/components/responses/BadRequest'
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
   /users/{idUser}/stream:
     parameters:
       - $ref: "#/components/parameters/idUser"
@@ -187,44 +222,6 @@ paths:
       responses:
         "204":
           $ref: "#/components/responses/No content"
-        "400": 
-          $ref: '#/components/responses/BadRequest'
-        "401": 
-          $ref: '#/components/responses/Unauthorized'
-        "404":
-          $ref: '#/components/responses/NotFound'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-  /users/{idUser}/edit:
-    parameters:
-      - $ref: "#/components/parameters/idUser"
-    put:
-      tags: ["users"]
-      summary: Change the username
-      description: Set a new username
-      operationId: setMyUserName
-      requestBody:
-        description: The new username
-        content:
-          application/json:
-            schema:
-              description: The new username
-              type: object
-              properties:
-                username:
-                  $ref: "#/components/schemas/Username"
-        required: true
-      responses:
-        "200":
-          description: Username updated
-          content:
-            application/json:
-              schema:
-                description: The new username
-                type: object
-                properties:
-                  username:
-                    $ref: "#/components/schemas/Username"
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -460,7 +457,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         "500": 
            $ref: "#/components/responses/InternalServerError"
-  /users/{idUser}/posts/{idPhoto}/likes: 
+  /users/{idUser}/posts/{idPhoto}/likes:
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idPhoto"

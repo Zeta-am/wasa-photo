@@ -1,114 +1,14 @@
-<template>
-  <div class="profile-view">
-    <ErrorMsg v-if="error" :msg="error"/>
-    <LoadingSpinner :loading="loading">
-      <div v-if="profile" class="profile-content">
-        <!-- Profile Header -->
-        <div class="profile-header">
-          <UserInfo
-            :username="profile.username"
-            :postCount="profile.postNo"
-            :followerCount="profile.followerNo"
-            :followingCount="profile.followingNo"
-            :isOwnProfile="isOwnProfile"
-            :isFollowing="profile.followed"
-          />
-
-          <!-- Action Buttons -->
-          <div class="action-buttons" v-if="isOwnProfile">
-            <!-- Upload Photo Button -->
-            <div class="upload-section mb-3">
-              <form @submit.prevent="uploadPhoto" enctype="multipart/form-data">
-                <input 
-                  type="file" 
-                  ref="photoInput"
-                  @change="handlePhotoSelect"
-                  accept="image/*"
-                  class="form-control mb-2"
-                >
-                <input 
-                  v-model="photoCaption"
-                  type="text"
-                  class="form-control mb-2"
-                  placeholder="Photo caption (max 200 characters)"
-                  maxlength="200"
-                >
-                <button type="submit" class="btn btn-primary">Upload Photo</button>
-              </form>
-            </div>
-
-            <!-- Username Change Section -->
-            <div class="username-change-section mb-3">
-              <ChangeUsernameForm @username-changed="handleUsernameChanged" />
-            </div>
-          </div>
-        </div>
-
-        <!-- Stats Buttons -->
-        <div class="stats-buttons mb-4">
-          <button @click="showFollowers" class="btn btn-info me-2">
-            Followers ({{ profile.followerNo }})
-          </button>
-          <button @click="showFollowing" class="btn btn-info me-2">
-            Following ({{ profile.followingNo }})
-          </button>
-          <button @click="showBanned" class="btn btn-danger" v-if="isOwnProfile">
-            Banned Users
-          </button>
-        </div>
-
-        <!-- Lists Modals -->
-        <div v-if="showList" class="user-list-modal">
-          <div class="modal-content">
-            <h3>{{ listTitle }}</h3>
-            <ul class="list-group">
-              <li v-for="user in userList" :key="user.id" class="list-group-item d-flex justify-content-between align-items-center">
-                {{ user.username }}
-                <button 
-                  v-if="isOwnProfile && !user.banned" 
-                  @click="toggleBan(user)"
-                  class="btn btn-sm"
-                  :class="user.banned ? 'btn-success' : 'btn-danger'"
-                >
-                  {{ user.banned ? 'Unban' : 'Ban' }}
-                </button>
-              </li>
-            </ul>
-            <button @click="closeList" class="btn btn-secondary mt-3">Close</button>
-          </div>
-        </div>
-
-        <!-- Photo Grid -->
-        <PhotoGrid 
-          :photos="photos" 
-          @open-photo="openPhoto" 
-          class="mt-4"
-        />
-      </div>
-    </LoadingSpinner>
-
-    <!-- Photo Modal -->
-    <div v-if="selectedPhoto" class="photo-modal">
-      <div class="modal-content">
-        <img :src="'data:image/jpeg;base64,' + selectedPhoto.image" :alt="selectedPhoto.caption">
-        <p>{{ selectedPhoto.caption }}</p>
-        <button @click="closePhoto" class="btn btn-secondary">Close</button>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script>
 import UserInfo from '@/components/UserInfo.vue'
 import PhotoGrid from '@/components/PhotoGrid.vue'
-import ChangeUsernameForm from '@/components/ChangeUsernameForm.vue'
+import ChangeUsernameModal from '@/components/ChangeUsernameModal.vue'
 
 export default {
   name: 'ProfileView',
   components: {
     UserInfo,
     PhotoGrid,
-    ChangeUsernameForm
+    ChangeUsernameModal
   },
   data() {
     return {
@@ -162,32 +62,6 @@ export default {
 
     handlePhotoSelect(event) {
       this.selectedFile = event.target.files[0]
-    },
-
-    async uploadPhoto() {
-      if (!this.selectedFile) {
-        this.error = 'Please select a photo'
-        return
-      }
-
-      try {
-        const formData = new FormData()
-        formData.append('image', this.selectedFile)
-        
-        const userId = this.$utils.getCurrentId()
-        await this.$axios.post(`/users/${userId}/posts?caption=${this.photoCaption}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        })
-
-        this.photoCaption = ''
-        this.selectedFile = null
-        this.$refs.photoInput.value = ''
-        await this.loadProfileData()
-      } catch (e) {
-        this.error = e.response?.data || 'Error uploading photo'
-      }
     },
 
     async showFollowers() {
@@ -256,7 +130,7 @@ export default {
     async handleUsernameChanged(newUsername) {
       try {
         const userId = this.$utils.getCurrentId()
-        await this.$axios.put(`/users/${userId}/edit`, {
+        await this.$axios.put(`/users/${userId}`, {
           username: newUsername
         })
         
@@ -266,10 +140,82 @@ export default {
       } catch (e) {
         this.error = e.response?.data || 'Error updating username'
       }
+    },
+
+    openChangeUsername() {
+      this.$refs.changeUsernameModal.open()
     }
   }
 }
 </script>
+
+<template>
+  <div class="profile-view">
+    <ErrorMsg v-if="error" :msg="error"/>
+    <LoadingSpinner :loading="loading">
+      <div v-if="profile" class="profile-content">
+        <!-- Profile Header -->
+        <div class="profile-header">
+          <UserInfo
+            :username="profile.username"
+            :postCount="profile.postNo"
+            :followerCount="profile.followerNo"
+            :followingCount="profile.followingNo"
+            :isOwnProfile="isOwnProfile"
+            :profileImage="profile.profileImage"
+            @edit-username="openChangeUsername"
+            @show-followers="showFollowers"
+            @show-following="showFollowing"
+            @profile-updated="loadProfileData"
+          />
+        </div>
+
+        <!-- Lists Modals -->
+        <div v-if="showList" class="user-list-modal">
+          <div class="modal-content">
+            <h3>{{ listTitle }}</h3>
+            <ul class="list-group">
+              <li v-for="user in userList" :key="user.id" class="list-group-item d-flex justify-content-between align-items-center">
+                {{ user.username }}
+                <button 
+                  v-if="isOwnProfile && !user.banned" 
+                  @click="toggleBan(user)"
+                  class="btn btn-sm"
+                  :class="user.banned ? 'btn-success' : 'btn-danger'"
+                >
+                  {{ user.banned ? 'Unban' : 'Ban' }}
+                </button>
+              </li>
+            </ul>
+            <button @click="closeList" class="btn btn-secondary mt-3">Close</button>
+          </div>
+        </div>
+
+        <!-- Photo Grid -->
+        <PhotoGrid 
+          :photos="photos" 
+          @open-photo="openPhoto" 
+          class="mt-4"
+        />
+      </div>
+    </LoadingSpinner>
+
+    <!-- Photo Modal -->
+    <div v-if="selectedPhoto" class="photo-modal">
+      <div class="modal-content">
+        <img :src="'data:image/jpeg;base64,' + selectedPhoto.image" :alt="selectedPhoto.caption">
+        <p>{{ selectedPhoto.caption }}</p>
+        <button @click="closePhoto" class="btn btn-secondary">Close</button>
+      </div>
+    </div>
+
+    <ChangeUsernameModal 
+      ref="changeUsernameModal"
+      @username-changed="handleUsernameChanged"
+    />
+  </div>
+</template>
+
 
 <style scoped>
 .profile-view {
@@ -325,5 +271,18 @@ export default {
   padding: 20px;
   border: 1px solid #eee;
   border-radius: 8px;
+}
+
+.edit-button {
+  padding: 8px 16px;
+  border: 1px solid #dbdbdb;
+  background: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.edit-button:hover {
+  background: #fafafa;
 }
 </style>
