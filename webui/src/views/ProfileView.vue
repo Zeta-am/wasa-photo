@@ -144,6 +144,11 @@ export default {
 
     openChangeUsername() {
       this.$refs.changeUsernameModal.open()
+    },
+
+    handlePhotoDeleted() {
+      this.selectedPhoto = null;
+      this.loadProfileData(); // Refresh photos after deletion
     }
   }
 }
@@ -201,13 +206,16 @@ export default {
     </LoadingSpinner>
 
     <!-- Photo Modal -->
-    <div v-if="selectedPhoto" class="photo-modal">
-      <div class="modal-content">
-        <img :src="'data:image/jpeg;base64,' + selectedPhoto.image" :alt="selectedPhoto.caption">
-        <p>{{ selectedPhoto.caption }}</p>
-        <button @click="closePhoto" class="btn btn-secondary">Close</button>
-      </div>
-    </div>
+    <PhotoModal 
+      v-if="selectedPhoto"
+      :show="!!selectedPhoto"
+      :photo="selectedPhoto"
+      :username="profile.username"
+      :isOwner="isOwnProfile"
+      @close="closePhoto"
+      @photo-updated="loadProfileData"
+      @photo-deleted="handlePhotoDeleted"
+    />
 
     <ChangeUsernameModal 
       ref="changeUsernameModal"

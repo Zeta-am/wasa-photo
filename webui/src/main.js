@@ -9,6 +9,8 @@ import PhotoGrid from './components/PhotoGrid.vue';
 import UserInfo from './components/UserInfo.vue';
 import ChangeUsernameForm from './components/ChangeUsernameModal.vue';
 import UploadPhotoModal from './components/UploadPhotoModal.vue'
+import PhotoModal from './components/PhotoModal.vue';
+
 
 const app = createApp(App)
 app.config.globalProperties.$axios = axios;
@@ -22,6 +24,8 @@ app.component("PhotoGrid", PhotoGrid);
 app.component("UserInfo", UserInfo);
 app.component("ChangeUsernameForm", ChangeUsernameForm);
 app.component("UploadPhotoModal", UploadPhotoModal)
+app.component("PhotoModal", PhotoModal)
+
 
 app.use(router)
 app.mount('#app')

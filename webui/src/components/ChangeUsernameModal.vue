@@ -50,6 +50,7 @@ export default {
         }
 
         const userId = this.$utils.getCurrentId();
+        // Ensure request body matches API spec
         const response = await this.$axios.put(`/users/${userId}`, {
           username: this.newUsername
         });
@@ -58,7 +59,6 @@ export default {
           localStorage.setItem('username', this.newUsername);
           this.$emit('username-changed', this.newUsername);
           this.close();
-          this.$router.go();
         }
       } catch (e) {
         this.error = e.response?.status === 400 

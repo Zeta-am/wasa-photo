@@ -65,8 +65,9 @@ export default {
 <template>
   <div class="user-info">
     <div class="user-header">
-      <!-- Profile Icon with interaction -->
-      <div class="profile-icon" @click="handleProfileClick">
+      <!-- Profile Icon without interaction if not owner -->
+      <div class="profile-icon" :class="{ 'profile-icon-interactive': isOwnProfile }" 
+           @click="isOwnProfile && handleProfileClick">
         <div v-if="profileImage" class="profile-image-container">
           <img :src="'data:image/jpeg;base64,' + profileImage" alt="Profile" class="profile-image">
         </div>
@@ -89,6 +90,7 @@ export default {
         <!-- Username Row -->
         <div class="username-row">
           <h2 class="username">{{ username }}</h2>
+          <!-- Only show edit button if owner -->
           <button v-if="isOwnProfile" 
                   @click="$emit('edit-username')" 
                   class="edit-button">
@@ -162,8 +164,22 @@ export default {
   border: 1px solid #dbdbdb;
   flex-shrink: 0;
   position: relative;
-  cursor: pointer;
   overflow: hidden;
+}
+
+.profile-icon-interactive {
+  cursor: pointer;
+}
+
+.profile-icon-interactive:hover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
 }
 
 .profile-image-container {
@@ -238,17 +254,6 @@ export default {
 
 .hidden-input {
   display: none;
-}
-
-.profile-icon:hover::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 50%;
 }
 
 .user-details {
