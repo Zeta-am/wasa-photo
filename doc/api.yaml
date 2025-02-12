@@ -117,9 +117,12 @@ paths:
                 type: object
                 properties:
                   posts:
+                    description: The list of posts
                     type: array
                     items:
                       $ref: "#/components/schemas/Post"
+                    minItems: 0
+                    maxItems: 50
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -147,9 +150,13 @@ paths:
                 type: object
                 properties:
                   followers:
+                    description: The list of users who follow the specified user
                     type: array
                     items:
-                      $ref: "#/components/schemas/User" 
+                      $ref: "#/components/schemas/User"
+                    minItems: 0
+                    maxItems: 50
+                    
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -177,9 +184,12 @@ paths:
                 type: object
                 properties:
                   followings:
+                    description: The list of users followed by the specified user
                     type: array
                     items:
                       $ref: "#/components/schemas/User"
+                    minItems: 0
+                    maxItems: 50
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -248,9 +258,12 @@ paths:
                 type: object
                 properties:
                   banned:
+                    description: The list of banned users
                     type: array
                     items:
                       $ref: "#/components/schemas/User"
+                    minItems: 0
+                    maxItems: 50
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -353,9 +366,12 @@ paths:
                 type: object
                 properties:
                   photos:
+                    description: The list of photos posted by the user
                     type: array
                     items:
                       $ref: "#/components/schemas/Post"
+                    minItems: 0
+                    maxItems: 50
         "400":
           $ref: "#/components/responses/BadRequest"
         "401": 
@@ -428,9 +444,12 @@ paths:
                 type: object
                 properties:
                   comments:
+                    description: The list of comments posted by the user
                     type: array
                     items:
                       $ref: "#/components/schemas/Comment"
+                    minItems: 0
+                    maxItems: 50
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -497,7 +516,7 @@ paths:
           $ref: "#/components/responses/InternalServerError" 
     get:
       summary: Get likes
-      description: Get the list of likes put by user
+      description: Get the list of likes put by the user
       tags: ["likes"]
       operationId: getLikes
       responses:
@@ -510,9 +529,12 @@ paths:
                 type: object
                 properties:
                   likes:
+                    description: The list of likes put by the user
                     type: array
                     items:
                       $ref: "#/components/schemas/User"
+                    minItems: 0
+                    maxItems: 50
         "400":
           $ref: "#/components/responses/BadRequest"
         "401": 
@@ -650,6 +672,7 @@ components:
       readOnly: true
       properties:
         date-time:
+          description: The date and time
           type: string
           format: date-time
           minLength: 20
@@ -662,6 +685,7 @@ components:
       readOnly: true
       properties:
         error:
+          description: The message of the error
           type: string
           pattern: '\S.+'
           example: Username is already taken
