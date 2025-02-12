@@ -53,8 +53,8 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	// Return the followed user
-	user, res, err := rt.db.GetUserById(banId)
+	// Return the banned user
+	user, res, err := rt.db.GetUserById(banId, uid) // Current user viewing banned user's profile
 
 	// Check for errors
 	if res == database.ERROR {

@@ -45,11 +45,11 @@ type AppDatabase interface {
 	IsUsernameExists(username string) (bool, int, error)
 	CreateUser(u utils.User) (utils.User, int, error)
 	GetUserProfile(userId int) (utils.User, int, error)
-	GetUserById(id int) (utils.User, int, error)
+	GetUserById(id int, currentUserId int) (utils.User, int, error)
 	SetMyUsername(username string, uid int) (int, error)
 	GetMyStream(uid int) ([]utils.Post, int, error)
 	GetUserPhotos(uid int) ([]utils.Post, int, error)
-	GetUsersByPattern(pattern string) ([]utils.User, int, error)
+	GetUsersByPattern(pattern string, currentUserId int) ([]utils.User, int, error)
 
 	/* Post */
 	CreatePost(p utils.Post) (int, int, error)

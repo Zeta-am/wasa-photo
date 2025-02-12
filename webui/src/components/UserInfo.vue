@@ -15,83 +15,31 @@ export default {
     return {
       showOptionsModal: false,
       showSettings: false,
-      localIsFollowed: this.isFollowed
+      loading: false
     }
   },
   methods: {
-    handleProfileClick() {
-      if (!this.isOwnProfile) return
-
-      if (this.profileImage) {
-        this.showOptionsModal = true
-      } else {
-        this.$refs.profileInput.click()
-      }
-    },
-    async handleProfileUpload(event) {
-      const file = event.target.files[0]
-      if (!file) return
-
-      try {
-        const formData = new FormData()
-        formData.append('image', file)
-        
-        const userId = this.$utils.getCurrentId()
-        await this.$axios.put(`/users/${userId}/profile-image`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        })
-        
-        this.$emit('profile-updated')
-        this.closeOptionsModal()
-      } catch (e) {
-        console.error('Error uploading profile picture:', e)
-      }
-    },
-    async removeProfilePhoto() {
-      try {
-        const userId = this.$utils.getCurrentId()
-        await this.$axios.delete(`/users/${userId}/profile-image`)
-        this.$emit('profile-updated')
-        this.closeOptionsModal()
-      } catch (e) {
-        console.error('Error removing profile picture:', e)
-      }
-    },
-    closeOptionsModal() {
-      this.showOptionsModal = false
-    },
     async toggleFollow() {
+      if (this.loading) return
+      
+      this.loading = true
       try {
         const currentUserId = this.$utils.getCurrentId()
-        if (this.localIsFollowed) {
+        
+        if (this.isFollowed) {
           await this.$axios.delete(`/users/${currentUserId}/followings/${this.userId}`)
         } else {
           await this.$axios.put(`/users/${currentUserId}/followings/${this.userId}`)
         }
-        this.localIsFollowed = !this.localIsFollowed
-        this.$emit('follow-toggled')
+        
+        await this.$emit('follow-toggled')
       } catch (e) {
         console.error('Error toggling follow:', e)
-      }
-    },
-    async handleBan() {
-      try {
-        const currentUserId = this.$utils.getCurrentId()
-        await this.$axios.put(`/users/${currentUserId}/banList/${this.userId}`)
-        this.$router.push('/home') // Redirect to home after banning
-      } catch (error) {
-        console.error('Error banning user:', error)
+      } finally {
+        this.loading = false
       }
     }
-  },
-  watch: {
-    isFollowed(newVal) {
-      this.localIsFollowed = newVal
-    }
-  },
-  emits: ['edit-username', 'show-followers', 'show-following', 'profile-updated', 'follow-toggled', 'toggle-ban', 'show-banned-list']
+  }
 }
 </script>
 
@@ -147,16 +95,19 @@ export default {
             <button
               @click="toggleFollow"
               class="follow-button"
-              :class="{ 'following': localIsFollowed }"
+              :class="{ 
+                'following': isFollowed,
+                'loading': loading 
+              }"
+              :disabled="loading"
             >
-              {{ localIsFollowed ? 'Following' : 'Follow' }}
+              {{ isFollowed ? 'Following' : 'Follow' }}
             </button>
             <div class="settings-dropdown">
               <button @click="showSettings = !showSettings" class="more-options-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                   <circle cx="12" cy="6" r="2"/>
                   <circle cx="12" cy="12" r="2"/>
-                  <circle cx="12" cy="18" r="2"/>
                 </svg>
               </button>
               <div v-if="showSettings" class="settings-menu">
@@ -391,6 +342,12 @@ export default {
   cursor: pointer;
   background: #0095f6;
   color: white;
+  transition: all 0.3s ease; /* Increased transition time */
+}
+
+.follow-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .follow-button.following {
@@ -398,8 +355,19 @@ export default {
   color: #262626;
 }
 
-.follow-button:hover {
-  opacity: 0.9;
+.follow-button.loading {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* Change hover state for following button */
+.follow-button.following:hover {
+  background: #dbdbdb;
+}
+
+/* Normal hover state */
+.follow-button:not(.following):hover {
+  background: #0081d6;
 }
 
 .settings-dropdown {

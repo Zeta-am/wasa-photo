@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"log"
 
 	"github.com/Zeta-am/wasa-photo/service/utils"
 )
@@ -35,17 +36,36 @@ func (db *appdbimpl) GetUserByName(username string) (utils.User, int, error) {
 	return db.fillUser(user)
 }
 
-func (db *appdbimpl) GetUserById(id int) (utils.User, int, error) {
-	var user utils.User
+func (db *appdbimpl) GetUserById(id int, currentUserId int) (utils.User, int, error) {
+    query := `
+        SELECT u.user_id, u.username, u.user_name, u.user_surname,
+               (SELECT COUNT(*) FROM posts WHERE user_id = u.user_id) as post_count,
+               (SELECT COUNT(*) FROM follows WHERE followed_id = u.user_id) as follower_count,
+               (SELECT COUNT(*) FROM follows WHERE follower_id = u.user_id) as following_count,
+               EXISTS (
+                   SELECT 1 FROM follows 
+                   WHERE follower_id = ? AND followed_id = u.user_id
+               ) as is_followed
+        FROM users u
+        WHERE u.user_id = ?`
 
-	err := db.c.QueryRow(`SELECT user_id, username 
-							FROM users
-							WHERE user_id = ?`, id).Scan(&user.UserID, &user.Username)
-	res := checkResults(err)
-	if res != SUCCESS {
-		return utils.User{}, res, err
-	}
-	return db.fillUser(user)
+    var user utils.User
+    err := db.c.QueryRow(query, currentUserId, id).Scan(
+        &user.UserID,
+        &user.Username,
+        &user.Name,
+        &user.Surname,
+        &user.PostCount,
+        &user.FollowerCount,
+        &user.FollowingCount,
+        &user.Followed,
+    )
+
+    if err != nil {
+        return utils.User{}, ERROR, err
+    }
+
+    return user, SUCCESS, nil
 }
 
 func (db *appdbimpl) IsUsernameExists(username string) (bool, int, error) {
@@ -218,27 +238,35 @@ func (db *appdbimpl) GetUserPhotos(uid int) ([]utils.Post, int, error) {
 	return posts, SUCCESS, nil
 }
 
-func (db *appdbimpl) GetUsersByPattern(pattern string) ([]utils.User, int, error) {
-	rows, err := db.c.Query(`SELECT user_id, username 
-                            FROM users 
-                            WHERE username LIKE ? || '%'
-                            LIMIT 10;`, pattern)
+func (db *appdbimpl) GetUsersByPattern(pattern string, currentUserId int) ([]utils.User, int, error) {
+	// Add logging to debug the query
+	rows, err := db.c.Query(`
+        SELECT DISTINCT u.user_id, u.username, u.user_name, u.user_surname
+        FROM users u
+        WHERE u.username LIKE ? 
+        AND u.user_id != ?  -- This should exclude the current user
+        AND u.user_id NOT IN (
+            SELECT b.banned_id 
+            FROM bans b 
+            WHERE b.user_id = ?
+        )
+    `, "%"+pattern+"%", currentUserId, currentUserId)
+
 	if err != nil {
 		return nil, ERROR, err
 	}
 	defer rows.Close()
 
+	// Add debug logging
 	var users []utils.User
 	for rows.Next() {
 		var user utils.User
-		if err := rows.Scan(&user.UserID, &user.Username); err != nil {
-			return nil, ERROR, err
-		}
-		// Fill additional user info
-		user, _, err = db.fillUser(user)
+		err := rows.Scan(&user.UserID, &user.Username, &user.Name, &user.Surname)
 		if err != nil {
 			return nil, ERROR, err
 		}
+		// Debug log
+		log.Printf("Found user: ID=%d, Username=%s", user.UserID, user.Username)
 		users = append(users, user)
 	}
 

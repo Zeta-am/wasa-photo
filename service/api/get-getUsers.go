@@ -20,9 +20,10 @@ func (rt *_router) getUsers(w http.ResponseWriter, r *http.Request, ps httproute
 		http.Error(w, "Missing username parameter", http.StatusBadRequest)
 		return
 	}
+	
 
 	// Get users from database
-	users, res, err := rt.db.GetUsersByPattern(username)
+	users, res, err := rt.db.GetUsersByPattern(username, ctx.UserID)
 	if res == database.ERROR {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

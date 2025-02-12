@@ -59,7 +59,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	// Return the user updated
-	usr, res, err := rt.db.GetUserById(uid)
+	usr, res, err := rt.db.GetUserById(uid, uid) // Current user viewing their own profile
 	switch res {
 	case database.NO_ROWS:
 		http.Error(w, err.Error(), http.StatusNotFound)

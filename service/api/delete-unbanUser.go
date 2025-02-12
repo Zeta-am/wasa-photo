@@ -51,7 +51,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	// Return the unbanned user
-	usr, res, err := rt.db.GetUserById(uid)
+	usr, res, err := rt.db.GetUserById(unbanId, uid) // Current user viewing unbanned user's profile
 	switch res {
 	case database.NO_ROWS:
 		http.Error(w, err.Error(), http.StatusNotFound)

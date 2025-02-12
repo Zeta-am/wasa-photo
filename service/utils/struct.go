@@ -26,6 +26,7 @@ type Post struct {
 type Comment struct {
 	CommentID int    `json:"id"`
 	UserID    int    `json:"userId"`
+	Username  string `json:"username"`
 	PostID    int    `json:"photoId"`
 	Timestamp string `json:"upload-time"`
 	Caption   string `json:"caption"`

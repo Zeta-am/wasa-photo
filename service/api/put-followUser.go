@@ -57,36 +57,19 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 	// Follow the user
 	res, err := rt.db.FollowUser(uid, followUid)
-	switch res {
-	case database.UNIQUE_FAILED: // The user was already followed
-		w.WriteHeader(http.StatusOK)
-		return
-	case database.NO_ROWS:
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	case database.ERROR:
+	if res != database.SUCCESS {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Return the followed user
-	user, res, err := rt.db.GetUserById(followUid)
-
-	// Check for errors
-	if res == database.ERROR {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if err != nil {
+	// Get updated user profile with correct followed status
+	user, res, err := rt.db.GetUserById(followUid, uid)
+	if res != database.SUCCESS {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Encode the response
-	w.WriteHeader(http.StatusCreated)
-	err = json.NewEncoder(w).Encode(user)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	// Return response
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(user)
 }

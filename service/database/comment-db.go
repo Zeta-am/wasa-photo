@@ -24,28 +24,34 @@ func (db *appdbimpl) DeleteComment(cid int, pid int, uid int) (int, error) {
 	return SUCCESS, nil
 }
 
-func (db *appdbimpl) GetComments(uid int, pid int) ([]utils.Comment, int, error) {
-	rows, err := db.c.Query(`SELECT * 
-								FROM comments
-								WHERE user_id = ? AND post_id = ?`, uid, pid)
-	if res := checkResults(err); res != SUCCESS {
-		return nil, res, err
-	}
-	defer func() {
-		if errow := rows.Close(); errow != nil {
-			err = errow
-		}
-	}()
-	var comms []utils.Comment
-	for rows.Next() {
-		var comm utils.Comment
-		if err = rows.Scan(&comm.CommentID, &comm.UserID, &comm.PostID); err != nil {
-			return nil, ERROR, err
-		}
-		comms = append(comms, comm)
-	}
-	if err = rows.Err(); err != nil {
+func (db *appdbimpl) GetComments(uid, pid int) ([]utils.Comment, int, error) {
+	rows, err := db.c.Query(`
+        SELECT c.comment_id, c.post_id, c.user_id, c.caption, c.timestamp, u.username
+        FROM comments c
+        JOIN users u ON c.user_id = u.user_id
+        WHERE c.post_id = ?
+        ORDER BY c.timestamp DESC`, pid)
+	if err != nil {
 		return nil, ERROR, err
 	}
-	return comms, SUCCESS, nil
+	defer rows.Close()
+
+	var comments []utils.Comment
+	for rows.Next() {
+		var comment utils.Comment
+		err := rows.Scan(
+			&comment.CommentID,
+			&comment.PostID,
+			&comment.UserID,
+			&comment.Caption,
+			&comment.Timestamp,
+			&comment.Username,
+		)
+		if err != nil {
+			return nil, ERROR, err
+		}
+		comments = append(comments, comment)
+	}
+
+	return comments, SUCCESS, nil
 }

@@ -35,34 +35,19 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 
 	// Unfollow the user
 	res, err := rt.db.UnfollowUser(uid, unfollowUid)
-	switch res {
-	case database.NO_ROWS:
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	case database.ERROR:
+	if res != database.SUCCESS {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Return the followed user
-	user, res, err := rt.db.GetUserById(unfollowUid)
-
-	// Check for errors
-	if res == database.ERROR {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if err != nil {
+	// Get updated user profile with correct followed status
+	user, res, err := rt.db.GetUserById(unfollowUid, uid)
+	if res != database.SUCCESS {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Encode the response
+	// Return response
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(user)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
+	json.NewEncoder(w).Encode(user)
 }
