@@ -1,21 +1,50 @@
 <template>
-	<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-	  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-		<h1 class="h2">Home page</h1>
-	  </div>
-	  <ErrorMsg v-if="errormsg" :msg="errormsg"/>
-	</main>
-  </template>
+  <main class="container h-100 d-flex align-items-center justify-content-center">
+    <div class="text-center">
+      <ErrorMsg v-if="errormsg" :msg="errormsg"/>
+      
+      <div class="mt-4">
+        <p class="text-muted">
+          Non ci sono post da visualizzare. 
+          <br>
+          Questo può essere dovuto al fatto che non segui ancora nessuno o che le persone che segui non hanno ancora pubblicato contenuti.
+        </p>
+        <button @click="openSearch" class="btn btn-primary mt-3">
+          Cerca persone da seguire
+        </button>
+      </div>
+    </div>
+    <SearchModal ref="searchModal" />
+  </main>
+</template>
 
 <script>
+import SearchModal from '@/components/SearchModal.vue'
+
 export default {
+  components: {
+    SearchModal
+  },
   data() {
     return {
       errormsg: null
+    }
+  },
+  created() {
+    // Reset any stored user ID when entering home view
+    localStorage.removeItem('lastVisitedProfile')
+  },
+  methods: {
+    openSearch() {
+      this.$refs.searchModal.open()
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
+main {
+  margin: 0 !important;
+  padding: 2rem !important;
+}
 </style>

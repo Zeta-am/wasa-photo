@@ -20,12 +20,6 @@ func (rt *_router) getBannedList(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	// Check if the user is authorized
-	if uid != ctx.UserID {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
 	// Get the list of user banned
 	users, res, err := rt.db.GetBannedList(uid)
 	if res == database.ERROR || err != nil {

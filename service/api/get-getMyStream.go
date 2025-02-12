@@ -20,12 +20,6 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// Check if the ID of the path is equal to the ID of the authorization
-	if uid != ctx.UserID {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
 	// Get the stream of the user from database
 	stream, res, err := rt.db.GetMyStream(uid)
 	if res == database.ERROR {

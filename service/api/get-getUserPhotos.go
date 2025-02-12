@@ -20,12 +20,6 @@ func (rt *_router) getUserPhotos(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	// Check if the ID of the path is equal to the ID of the authorization
-	if uid != ctx.UserID {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
 	// Get the posts from database
 	posts, res, err := rt.db.GetUserPhotos(uid)
 	if res == database.ERROR || err != nil {

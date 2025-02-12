@@ -2,19 +2,21 @@
 import UserInfo from '@/components/UserInfo.vue'
 import PhotoGrid from '@/components/PhotoGrid.vue'
 import ChangeUsernameModal from '@/components/ChangeUsernameModal.vue'
+import BannedListModal from '@/components/BannedListModal.vue'
 
 export default {
   name: 'ProfileView',
   components: {
     UserInfo,
     PhotoGrid,
-    ChangeUsernameModal
+    ChangeUsernameModal,
+    BannedListModal
   },
   data() {
     return {
       profile: null,
       photos: [],
-      loading: true,
+      loading: false,
       error: null,
       isOwnProfile: false,
       photoCaption: '',
@@ -28,35 +30,45 @@ export default {
   created() {
     this.loadProfileData()
   },
+  watch: {
+    '$route.params.userId': {
+      handler() {
+        this.loadProfileData()
+      },
+      immediate: true
+    }
+  },
   methods: {
     async loadProfileData() {
-      this.loading = true;
-      this.error = null;
+      this.loading = true
+      this.error = null
       
       try {
-        const userId = this.$route.params.userId;
-        const currentId = this.$utils.getCurrentId();
-        
-        this.isOwnProfile = Number(userId) === Number(currentId);
+        const userId = this.$route.params.userId
+        if (!userId || this.$route.name === 'home') {
+          return
+        }
 
-        // Set auth header before making requests
-        this.$setAuth();
-
-        const [profileRes, photosRes] = await Promise.all([
+        console.log('Loading photos for userId:', userId)
+        const [profileResponse, photosResponse] = await Promise.all([
           this.$axios.get(`/users/${userId}`),
           this.$axios.get(`/users/${userId}/posts`)
-        ]);
+        ])
 
-        this.profile = profileRes.data;
-        this.photos = photosRes.data;
+        console.log('Photos Response:', photosResponse.data)
+        
+        this.profile = profileResponse.data
+        // Handle the photos array directly since the API returns an array
+        this.photos = Array.isArray(photosResponse.data) ? photosResponse.data : []
+        this.isOwnProfile = userId === this.$utils.getCurrentId().toString()
+
+        localStorage.setItem('lastVisitedProfile', userId)
       } catch (e) {
-        if (e.response?.status === 401) {
-          this.$router.push('/login');
-        } else {
-          this.error = e.response?.data || 'Error loading profile';
-        }
+        console.error('Profile load error:', e)
+        this.error = e.response?.data || 'Error loading profile'
+        this.photos = [] // Reset photos on error
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
 
@@ -150,6 +162,12 @@ export default {
       this.selectedPhoto = null;
       this.loadProfileData(); // Refresh photos after deletion
     }
+  },
+  beforeRouteLeave(to, from, next) {
+    if (to.name === 'home') {
+      localStorage.removeItem('lastVisitedProfile')
+    }
+    next()
   }
 }
 </script>
@@ -160,20 +178,23 @@ export default {
     <LoadingSpinner :loading="loading">
       <div v-if="profile" class="profile-content">
         <!-- Profile Header -->
-        <div class="profile-header">
-          <UserInfo
+        <UserInfo
             :username="profile.username"
             :postCount="profile.postNo"
             :followerCount="profile.followerNo"
             :followingCount="profile.followingNo"
             :isOwnProfile="isOwnProfile"
             :profileImage="profile.profileImage"
+            :isFollowed="profile.followed"
+            :userId="profile.id"
             @edit-username="openChangeUsername"
             @show-followers="showFollowers"
             @show-following="showFollowing"
             @profile-updated="loadProfileData"
+            @follow-toggled="loadProfileData"
+            @show-banned-list="$refs.bannedListModal.open()"
+            @toggle-ban="toggleBan"
           />
-        </div>
 
         <!-- Lists Modals -->
         <div v-if="showList" class="user-list-modal">
@@ -196,12 +217,16 @@ export default {
           </div>
         </div>
 
-        <!-- Photo Grid -->
+        <!-- Photos Grid -->
         <PhotoGrid 
-          :photos="photos" 
-          @open-photo="openPhoto" 
+          :photos="photos"
+          @open-photo="openPhoto"
+          v-if="photos && photos.length > 0"
           class="mt-4"
         />
+        <div v-else class="text-center mt-4">
+          <p class="text-muted">No photos yet</p>
+        </div>
       </div>
     </LoadingSpinner>
 
@@ -221,6 +246,8 @@ export default {
       ref="changeUsernameModal"
       @username-changed="handleUsernameChanged"
     />
+
+    <BannedListModal ref="bannedListModal" />
   </div>
 </template>
 

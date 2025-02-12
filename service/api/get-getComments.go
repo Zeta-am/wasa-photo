@@ -20,12 +20,6 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	// Check if the ID of the path is equal to the ID of the authorization
-	if uid != ctx.UserID {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
 	// Get the post_id from the url
 	pid, err := strconv.Atoi(ps.ByName("idPhoto"))
 	if err != nil {

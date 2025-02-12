@@ -217,3 +217,34 @@ func (db *appdbimpl) GetUserPhotos(uid int) ([]utils.Post, int, error) {
 	}
 	return posts, SUCCESS, nil
 }
+
+func (db *appdbimpl) GetUsersByPattern(pattern string) ([]utils.User, int, error) {
+	rows, err := db.c.Query(`SELECT user_id, username 
+                            FROM users 
+                            WHERE username LIKE ? || '%'
+                            LIMIT 10;`, pattern)
+	if err != nil {
+		return nil, ERROR, err
+	}
+	defer rows.Close()
+
+	var users []utils.User
+	for rows.Next() {
+		var user utils.User
+		if err := rows.Scan(&user.UserID, &user.Username); err != nil {
+			return nil, ERROR, err
+		}
+		// Fill additional user info
+		user, _, err = db.fillUser(user)
+		if err != nil {
+			return nil, ERROR, err
+		}
+		users = append(users, user)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, ERROR, err
+	}
+
+	return users, SUCCESS, nil
+}

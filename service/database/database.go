@@ -49,6 +49,7 @@ type AppDatabase interface {
 	SetMyUsername(username string, uid int) (int, error)
 	GetMyStream(uid int) ([]utils.Post, int, error)
 	GetUserPhotos(uid int) ([]utils.Post, int, error)
+	GetUsersByPattern(pattern string) ([]utils.User, int, error)
 
 	/* Post */
 	CreatePost(p utils.Post) (int, int, error)
@@ -76,6 +77,7 @@ type AppDatabase interface {
 	UnbanUser(uid int, unbannedId int) (int, error)
 	IsBanned(uid int, bannerId int) (bool, int, error)
 	GetBannedList(uid int) ([]utils.User, int, error)
+
 
 	Ping() error
 }

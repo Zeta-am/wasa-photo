@@ -10,6 +10,9 @@ import UserInfo from './components/UserInfo.vue';
 import ChangeUsernameForm from './components/ChangeUsernameModal.vue';
 import UploadPhotoModal from './components/UploadPhotoModal.vue'
 import PhotoModal from './components/PhotoModal.vue';
+import SearchModal from './components/SearchModal.vue';
+import SearchResult from './components/SearchResult.vue';
+import BannedListModal from './components/BannedListModal.vue';
 
 
 const app = createApp(App)
@@ -25,7 +28,9 @@ app.component("UserInfo", UserInfo);
 app.component("ChangeUsernameForm", ChangeUsernameForm);
 app.component("UploadPhotoModal", UploadPhotoModal)
 app.component("PhotoModal", PhotoModal)
-
+app.component("SearchModal", SearchModal)
+app.component("SearchResult", SearchResult)
+app.component("BannedListModal", BannedListModal)
 
 app.use(router)
 app.mount('#app')

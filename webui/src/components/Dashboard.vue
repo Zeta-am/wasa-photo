@@ -1,4 +1,5 @@
 <script>
+import SearchModal from './SearchModal.vue';
 import UploadPhotoModal from './UploadPhotoModal.vue'
 
 export default {
@@ -9,21 +10,26 @@ export default {
     logo: String
   },
   components: {
-    UploadPhotoModal
+    UploadPhotoModal,
+    SearchModal
   },
   methods: {
     openUploadModal() {
       this.$refs.uploadModal.open()
+    },
+    openSearchModal() {
+      this.$refs.searchModal.open()
     }
   },
-  emits: ['logout', 'open-upload']
+  emits: ['logout', 'open-upload', 'open-search']
 }
 </script>
 
 <template>
   <div class="dashboard">
-    <!-- Add modal component at root level -->
+
     <UploadPhotoModal ref="uploadModal" />
+    <SearchModal ref="searchModal" />
     
     <nav id="sidebarMenu" class="sidebar">
       <div class="sidebar-content">
@@ -38,12 +44,12 @@ export default {
             </RouterLink>
           </li>
           <li class="nav-item">
-            <RouterLink to="/search" class="nav-link" title="Search">
+            <a class="nav-link" role="button" @click="$emit('open-search')" title="Search">
               <svg aria-label="Search" class="_ab6-" color="currentColor" fill="currentColor" height="24" role="img" viewBox="0 0 24 24" width="24">
                 <path d="M19 10.5A8.5 8.5 0 1 1 10.5 2a8.5 8.5 0 0 1 8.5 8.5Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
                 <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" x1="16.511" x2="22" y1="16.511" y2="22"/>
               </svg>
-            </RouterLink>
+            </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" role="button" @click="$emit('open-upload')" title="Create Post">

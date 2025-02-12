@@ -2,12 +2,14 @@
 import { RouterLink, RouterView } from 'vue-router'
 import Dashboard from '@/components/Dashboard.vue'
 import UploadPhotoModal from '@/components/UploadPhotoModal.vue'
+import SearchModal from './components/SearchModal.vue';
 </script>
 <script>
 export default {
   components: {
     Dashboard,
-    UploadPhotoModal
+    UploadPhotoModal,
+	SearchModal
   },
 	data: function() {
 		return {
@@ -53,9 +55,12 @@ export default {
 			this.$setAuth();
 			this.$router.push({ name: 'Login' });
 		},
-    openUploadModal() {
-      this.$refs.uploadModal.open()
-    }
+		openUploadModal() {
+			this.$refs.uploadModal.open()
+		},
+		openSearchModal() {
+			this.$refs.searchModal.open()
+		},
 	},
 	mounted() {
 		this.$setAuth();
@@ -84,11 +89,13 @@ export default {
       :usrLink="usrLink"
       @logout="logout"
       @open-upload="openUploadModal"
+	  @open-search="openSearchModal"
     />
     <main :class="['px-md-4', 'w-100']">
       <RouterView />
     </main>
     <UploadPhotoModal ref="uploadModal" />
+	<SearchModal ref="searchModal" />
   </div>
 </template>
 

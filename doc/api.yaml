@@ -1,12 +1,13 @@
-openapi: 3.0.0
+openapi: 3.0.2
 info:
   title: WASAPhoto
   description: |
     OpenAPI document for the WASAPhoto application
-  version: 1.0.2  
+  version: 1.1.0  
 paths:   
   /users:
     post:
+
       tags: ["users"]
       summary: Logs in the user
       description: |
@@ -36,6 +37,46 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
       security: [] 
+    get:
+      tags: ["users"]
+      summary: Get the user profile by username
+      description: |
+        Get the profile of a user by username
+      operationId: getUsers
+
+      parameters:
+        - name: username
+          in: query
+          description: The username of the user
+          required: true
+          schema:
+            $ref: "#/components/schemas/Username"
+
+      responses:
+        "200":
+          description: The user has been found
+          content:
+            application/json:
+              schema: 
+                description: List of username found
+                type: object
+                properties:
+                  users:
+                    description: The list of users found
+                    type: array
+                    minItems: 0
+                    maxItems: 50
+                    items:
+                      $ref: "#/components/schemas/Username"
+        "400": 
+          $ref: '#/components/responses/BadRequest'
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /users/{idUser}:
     parameters:
         - $ref: "#/components/parameters/idUser"
@@ -119,10 +160,10 @@ paths:
                   posts:
                     description: The list of posts
                     type: array
-                    items:
-                      $ref: "#/components/schemas/Post"
                     minItems: 0
                     maxItems: 50
+                    items:
+                      $ref: "#/components/schemas/Post"
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -152,10 +193,10 @@ paths:
                   followers:
                     description: The list of users who follow the specified user
                     type: array
-                    items:
-                      $ref: "#/components/schemas/User"
                     minItems: 0
                     maxItems: 50
+                    items:
+                      $ref: "#/components/schemas/User"
                     
         "400": 
           $ref: '#/components/responses/BadRequest'
@@ -186,10 +227,10 @@ paths:
                   followings:
                     description: The list of users followed by the specified user
                     type: array
-                    items:
-                      $ref: "#/components/schemas/User"
                     minItems: 0
                     maxItems: 50
+                    items:
+                      $ref: "#/components/schemas/User"
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -260,10 +301,10 @@ paths:
                   banned:
                     description: The list of banned users
                     type: array
-                    items:
-                      $ref: "#/components/schemas/User"
                     minItems: 0
                     maxItems: 50
+                    items:
+                      $ref: "#/components/schemas/User"
         "400": 
           $ref: '#/components/responses/BadRequest'
         "401": 
@@ -446,10 +487,10 @@ paths:
                   comments:
                     description: The list of comments posted by the user
                     type: array
-                    items:
-                      $ref: "#/components/schemas/Comment"
                     minItems: 0
                     maxItems: 50
+                    items:
+                      $ref: "#/components/schemas/Comment"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":

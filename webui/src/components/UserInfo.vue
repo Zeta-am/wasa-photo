@@ -6,11 +6,16 @@ export default {
     followerCount: Number,
     followingCount: Number,
     isOwnProfile: Boolean,
-    profileImage: String
+    profileImage: String,
+    isFollowed: Boolean,
+    userId: Number,
+    isBanned: Boolean
   },
   data() {
     return {
-      showOptionsModal: false
+      showOptionsModal: false,
+      showSettings: false,
+      localIsFollowed: this.isFollowed
     }
   },
   methods: {
@@ -56,9 +61,37 @@ export default {
     },
     closeOptionsModal() {
       this.showOptionsModal = false
+    },
+    async toggleFollow() {
+      try {
+        const currentUserId = this.$utils.getCurrentId()
+        if (this.localIsFollowed) {
+          await this.$axios.delete(`/users/${currentUserId}/followings/${this.userId}`)
+        } else {
+          await this.$axios.put(`/users/${currentUserId}/followings/${this.userId}`)
+        }
+        this.localIsFollowed = !this.localIsFollowed
+        this.$emit('follow-toggled')
+      } catch (e) {
+        console.error('Error toggling follow:', e)
+      }
+    },
+    async handleBan() {
+      try {
+        const currentUserId = this.$utils.getCurrentId()
+        await this.$axios.put(`/users/${currentUserId}/banList/${this.userId}`)
+        this.$router.push('/home') // Redirect to home after banning
+      } catch (error) {
+        console.error('Error banning user:', error)
+      }
     }
   },
-  emits: ['edit-username', 'show-followers', 'show-following', 'profile-updated']
+  watch: {
+    isFollowed(newVal) {
+      this.localIsFollowed = newVal
+    }
+  },
+  emits: ['edit-username', 'show-followers', 'show-following', 'profile-updated', 'follow-toggled', 'toggle-ban', 'show-banned-list']
 }
 </script>
 
@@ -90,12 +123,49 @@ export default {
         <!-- Username Row -->
         <div class="username-row">
           <h2 class="username">{{ username }}</h2>
-          <!-- Only show edit button if owner -->
-          <button v-if="isOwnProfile" 
-                  @click="$emit('edit-username')" 
-                  class="edit-button">
-            Edit username
-          </button>
+          <!-- Own profile controls -->
+          <div v-if="isOwnProfile" class="action-buttons">
+            <button @click="$emit('edit-username')" class="btn btn-primary">
+              Edit username
+            </button>
+            <div class="settings-dropdown">
+              <button @click="showSettings = !showSettings" class="settings-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+              </button>
+              <div v-if="showSettings" class="settings-menu">
+                <button @click="$emit('show-banned-list')" class="settings-item">
+                  Banned Users
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Other profile controls -->
+          <div v-else class="action-buttons">
+            <button
+              @click="toggleFollow"
+              class="follow-button"
+              :class="{ 'following': localIsFollowed }"
+            >
+              {{ localIsFollowed ? 'Following' : 'Follow' }}
+            </button>
+            <div class="settings-dropdown">
+              <button @click="showSettings = !showSettings" class="more-options-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                  <circle cx="12" cy="6" r="2"/>
+                  <circle cx="12" cy="12" r="2"/>
+                  <circle cx="12" cy="18" r="2"/>
+                </svg>
+              </button>
+              <div v-if="showSettings" class="settings-menu">
+                <button @click="handleBan" class="settings-item text-danger">
+                  Ban User
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Stats Row -->
@@ -311,5 +381,117 @@ export default {
 
 .stat-label {
   color: #262626;
+}
+
+.follow-button {
+  padding: 8px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #0095f6;
+  color: white;
+}
+
+.follow-button.following {
+  background: #efefef;
+  color: #262626;
+}
+
+.follow-button:hover {
+  opacity: 0.9;
+}
+
+.settings-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.settings-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+.settings-item {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  text-align: left;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.settings-item:hover {
+  background: #fafafa;
+}
+
+.settings-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 10px;
+}
+
+.settings-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.more-options-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.more-options-btn svg {
+  fill: currentColor;
+}
+
+.text-danger {
+  color: #ed4956;
+}
+
+.settings-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #dbdbdb;
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  z-index: 1000;
+  min-width: 150px;
+}
+
+.settings-item {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  text-align: left;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.settings-item:hover {
+  background: #fafafa;
 }
 </style>

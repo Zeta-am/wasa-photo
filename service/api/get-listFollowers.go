@@ -20,12 +20,6 @@ func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	// Check if the ID of the path is equal to the ID of the authorization
-	if uid != ctx.UserID {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
 	// Get the list of the followers from the database
 	followers, res, err := rt.db.GetListFollowers(uid)
 	if res == database.ERROR || err != nil {
