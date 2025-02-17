@@ -15,15 +15,27 @@
       </div>
     </div>
     <SearchModal ref="searchModal" />
+    <div class="home-container">
+      <Dashboard 
+        :username="username"
+        :usrLink="usrLink"
+        @logout="logout"
+        @open-upload="$parent.openUploadModal"
+        @open-search="$parent.openSearchModal"
+      />
+      <!-- resto del contenuto della home -->
+    </div>
   </main>
 </template>
 
 <script>
 import SearchModal from '@/components/SearchModal.vue'
+import Dashboard from '@/components/Dashboard.vue'
 
 export default {
   components: {
-    SearchModal
+    SearchModal,
+    Dashboard
   },
   data() {
     return {
@@ -34,9 +46,23 @@ export default {
     // Reset any stored user ID when entering home view
     localStorage.removeItem('lastVisitedProfile')
   },
+  computed: {
+    username() {
+      return localStorage.getItem('username')
+    },
+    usrLink() {
+      return `/users/${localStorage.getItem('token')}`
+    }
+  },
   methods: {
     openSearch() {
       this.$refs.searchModal.open()
+    },
+    logout() {
+      localStorage.removeItem('token')
+      localStorage.removeItem('username')
+      this.$setAuth()
+      this.$router.push({ name: 'Login' })
     }
   }
 }
@@ -46,5 +72,9 @@ export default {
 main {
   margin: 0 !important;
   padding: 2rem !important;
+}
+
+.home-container, .profile-container {
+  padding-left: 60px; /* larghezza della dashboard */
 }
 </style>

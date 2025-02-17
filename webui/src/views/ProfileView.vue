@@ -3,6 +3,7 @@ import UserInfo from '@/components/UserInfo.vue'
 import PhotoGrid from '@/components/PhotoGrid.vue'
 import ChangeUsernameModal from '@/components/ChangeUsernameModal.vue'
 import BannedListModal from '@/components/BannedListModal.vue'
+import Dashboard from '@/components/Dashboard.vue'
 
 export default {
   name: 'ProfileView',
@@ -10,7 +11,8 @@ export default {
     UserInfo,
     PhotoGrid,
     ChangeUsernameModal,
-    BannedListModal
+    BannedListModal,
+    Dashboard
   },
   data() {
     return {
@@ -36,6 +38,14 @@ export default {
         this.loadProfileData()
       },
       immediate: true
+    }
+  },
+  computed: {
+    username() {
+      return localStorage.getItem('username')
+    },
+    usrLink() {
+      return `/users/${localStorage.getItem('token')}`
     }
   },
   methods: {
@@ -157,6 +167,13 @@ export default {
     handlePhotoDeleted() {
       this.selectedPhoto = null;
       this.loadProfileData(); // Refresh photos after deletion
+    },
+
+    logout() {
+      localStorage.removeItem('token')
+      localStorage.removeItem('username')
+      this.$setAuth()
+      this.$router.push({ name: 'Login' })
     }
   },
   beforeRouteLeave(to, from, next) {
@@ -169,81 +186,90 @@ export default {
 </script>
 
 <template>
-  <div class="profile-view">
-    <ErrorMsg v-if="error" :msg="error"/>
-    <LoadingSpinner :loading="loading">
-      <div v-if="profile" class="profile-content">
-        <!-- Profile Header -->
-        <UserInfo
-            :username="profile.username"
-            :postCount="profile.postNo"
-            :followerCount="profile.followerNo"
-            :followingCount="profile.followingNo"
-            :isOwnProfile="isOwnProfile"
-            :profileImage="profile.profileImage"
-            :isFollowed="profile.followed"
-            :userId="profile.id"
-            @edit-username="openChangeUsername"
-            @show-followers="showFollowers"
-            @show-following="showFollowing"
-            @profile-updated="loadProfileData"
-            @follow-toggled="loadProfileData"
-            @show-banned-list="$refs.bannedListModal.open()"
-            @toggle-ban="toggleBan"
-          />
+  <div class="profile-container">
+    <Dashboard 
+      :username="username"
+      :usrLink="usrLink"
+      @logout="logout"
+      @open-upload="$parent.openUploadModal"
+      @open-search="$parent.openSearchModal"
+    />
+    <div class="profile-view">
+      <ErrorMsg v-if="error" :msg="error"/>
+      <LoadingSpinner :loading="loading">
+        <div v-if="profile" class="profile-content">
+          <!-- Profile Header -->
+          <UserInfo
+              :username="profile.username"
+              :postCount="profile.postNo"
+              :followerCount="profile.followerNo"
+              :followingCount="profile.followingNo"
+              :isOwnProfile="isOwnProfile"
+              :profileImage="profile.profileImage"
+              :isFollowed="profile.followed"
+              :userId="profile.id"
+              @edit-username="openChangeUsername"
+              @show-followers="showFollowers"
+              @show-following="showFollowing"
+              @profile-updated="loadProfileData"
+              @follow-toggled="loadProfileData"
+              @show-banned-list="$refs.bannedListModal.open()"
+              @toggle-ban="toggleBan"
+            />
 
-        <!-- Lists Modals -->
-        <div v-if="showList" class="user-list-modal">
-          <div class="modal-content">
-            <h3>{{ listTitle }}</h3>
-            <ul class="list-group">
-              <li v-for="user in userList" :key="user.id" class="list-group-item d-flex justify-content-between align-items-center">
-                {{ user.username }}
-                <button 
-                  v-if="isOwnProfile && !user.banned" 
-                  @click="toggleBan(user)"
-                  class="btn btn-sm"
-                  :class="user.banned ? 'btn-success' : 'btn-danger'"
-                >
-                  {{ user.banned ? 'Unban' : 'Ban' }}
-                </button>
-              </li>
-            </ul>
-            <button @click="closeList" class="btn btn-secondary mt-3">Close</button>
+          <!-- Lists Modals -->
+          <div v-if="showList" class="user-list-modal">
+            <div class="modal-content">
+              <h3>{{ listTitle }}</h3>
+              <ul class="list-group">
+                <li v-for="user in userList" :key="user.id" class="list-group-item d-flex justify-content-between align-items-center">
+                  {{ user.username }}
+                  <button 
+                    v-if="isOwnProfile && !user.banned" 
+                    @click="toggleBan(user)"
+                    class="btn btn-sm"
+                    :class="user.banned ? 'btn-success' : 'btn-danger'"
+                  >
+                    {{ user.banned ? 'Unban' : 'Ban' }}
+                  </button>
+                </li>
+              </ul>
+              <button @click="closeList" class="btn btn-secondary mt-3">Close</button>
+            </div>
+          </div>
+
+          <!-- Photos Grid -->
+          <PhotoGrid 
+            :photos="photos"
+            @open-photo="openPhoto"
+            v-if="photos && photos.length > 0"
+            class="mt-4"
+          />
+          <div v-else class="text-center mt-4">
+            <p class="text-muted">No photos yet</p>
           </div>
         </div>
+      </LoadingSpinner>
 
-        <!-- Photos Grid -->
-        <PhotoGrid 
-          :photos="photos"
-          @open-photo="openPhoto"
-          v-if="photos && photos.length > 0"
-          class="mt-4"
-        />
-        <div v-else class="text-center mt-4">
-          <p class="text-muted">No photos yet</p>
-        </div>
-      </div>
-    </LoadingSpinner>
+      <!-- Photo Modal -->
+      <PhotoModal 
+        v-if="selectedPhoto"
+        :show="!!selectedPhoto"
+        :photo="selectedPhoto"
+        :username="profile.username"
+        :isOwner="isOwnProfile"
+        @close="closePhoto"
+        @photo-updated="loadProfileData"
+        @photo-deleted="handlePhotoDeleted"
+      />
 
-    <!-- Photo Modal -->
-    <PhotoModal 
-      v-if="selectedPhoto"
-      :show="!!selectedPhoto"
-      :photo="selectedPhoto"
-      :username="profile.username"
-      :isOwner="isOwnProfile"
-      @close="closePhoto"
-      @photo-updated="loadProfileData"
-      @photo-deleted="handlePhotoDeleted"
-    />
+      <ChangeUsernameModal 
+        ref="changeUsernameModal"
+        @username-changed="handleUsernameChanged"
+      />
 
-    <ChangeUsernameModal 
-      ref="changeUsernameModal"
-      @username-changed="handleUsernameChanged"
-    />
-
-    <BannedListModal ref="bannedListModal" />
+      <BannedListModal ref="bannedListModal" />
+    </div>
   </div>
 </template>
 
@@ -315,5 +341,9 @@ export default {
 
 .edit-button:hover {
   background: #fafafa;
+}
+
+.home-container, .profile-container {
+  padding-left: 60px; /* larghezza della dashboard */
 }
 </style>

@@ -41,7 +41,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	// Check if the username exists
-	exist, _, _ := rt.db.IsUsernameExists(usrUpdated.Username)
+	exist, _, _ := rt.db.IsUsernameExists(usrUpdated.Username, uid)
 	if exist {
 		http.Error(w, "the username already exists", http.StatusBadRequest)
 		return
@@ -71,7 +71,12 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 
 	// Encode the response
 	w.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(w).Encode(usr)
+	response := struct {
+		Username string `json:"username"`
+	}{
+		Username: usr.Username,
+	}
+	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
 		http.Error(w, "can't encode the response", http.StatusInternalServerError)
 		return

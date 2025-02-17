@@ -637,20 +637,6 @@ components:
           type: integer
           readOnly: true
           example: 100
-        name:
-          description: User's name
-          type: string
-          pattern: '^.*?$'
-          minLength: 2
-          maxLength: 52
-          example: Andrea
-        surname:
-          description: User's surname
-          type: string
-          pattern: '^.*?$'
-          minLength: 2
-          maxLength: 52
-          example: Rossi
         username:
           $ref: "#/components/schemas/Username"
         postNo:

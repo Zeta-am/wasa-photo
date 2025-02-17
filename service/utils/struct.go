@@ -3,8 +3,6 @@ package utils
 type User struct {
 	UserID         int    `json:"id"`
 	Username       string `json:"username"`
-	Name           string `json:"name"`
-	Surname        string `json:"surname"`
 	PostCount      int    `json:"postNo"`
 	FollowerCount  int    `json:"followerNo"`
 	FollowingCount int    `json:"followingNo"`

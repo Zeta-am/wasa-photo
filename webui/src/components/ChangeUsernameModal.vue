@@ -1,32 +1,3 @@
-<!-- src/components/ChangeUsernameModal.vue -->
-<template>
-  <div v-if="show" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h6>Change username</h6>
-      </div>
-      <div class="modal-body">
-        <input 
-          v-model="newUsername" 
-          type="text"
-          class="form-control"
-          placeholder="New username"
-          pattern="^[a-zA-Z0-9_$]{3,16}$"
-          required
-        >
-        <small class="text-muted">3-16 characters, letters, numbers, _ or $</small>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" @click="close">Cancel</button>
-        <button class="btn-done" @click="changeUsername" :disabled="isLoading">
-          {{ isLoading ? 'Changing...' : 'Done' }}
-        </button>
-      </div>
-      <div v-if="error" class="error-message">{{ error }}</div>
-    </div>
-  </div>
-</template>
-
 <script>
 export default {
   data() {
@@ -79,6 +50,34 @@ export default {
   }
 }
 </script>
+<template>
+  <div v-if="show" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6>Change username</h6>
+      </div>
+      <div class="modal-body">
+        <input 
+          v-model="newUsername" 
+          type="text"
+          class="form-control"
+          placeholder="New username"
+          pattern="^[a-zA-Z0-9_$]{3,16}$"
+          required
+        >
+        <small class="text-muted">3-16 characters, letters, numbers, _ or $</small>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" @click="close">Cancel</button>
+        <button class="btn-done" @click="changeUsername" :disabled="isLoading">
+          {{ isLoading ? 'Changing...' : 'Done' }}
+        </button>
+      </div>
+      <div v-if="error" class="error-message">{{ error }}</div>
+    </div>
+  </div>
+</template>
+
 
 <style scoped>
 .modal-overlay {

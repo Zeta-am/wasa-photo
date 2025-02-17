@@ -38,13 +38,13 @@ func (db *appdbimpl) GetUserByName(username string) (utils.User, int, error) {
 
 func (db *appdbimpl) GetUserById(id int, currentUserId int) (utils.User, int, error) {
 	var user utils.User
-	err := db.c.QueryRow(`SELECT user_id, username, user_name, user_surname, 
+	err := db.c.QueryRow(`SELECT user_id, username, 
         (SELECT COUNT(*) FROM posts WHERE user_id = ?) AS postNo, 
         (SELECT COUNT(*) FROM follows WHERE followed_id = ?) AS followerNo, 
         (SELECT COUNT(*) FROM follows WHERE follower_id = ?) AS followingNo, 
         EXISTS(SELECT 1 FROM follows WHERE follower_id = ? AND followed_id = ?) AS followed 
         FROM users WHERE user_id = ?`, id, id, id, currentUserId, id, id).Scan(
-		&user.UserID, &user.Username, &user.Name, &user.Surname, &user.PostCount,
+		&user.UserID, &user.Username, &user.PostCount,
 		&user.FollowerCount, &user.FollowingCount, &user.Followed)
 	if err != nil {
 		return user, ERROR, err
@@ -52,11 +52,12 @@ func (db *appdbimpl) GetUserById(id int, currentUserId int) (utils.User, int, er
 	return user, SUCCESS, nil
 }
 
-func (db *appdbimpl) IsUsernameExists(username string) (bool, int, error) {
+func (db *appdbimpl) IsUsernameExists(username string, uid int) (bool, int, error) {
 	var usern string
 	err := db.c.QueryRow(`SELECT username 
 							FROM users 
-							WHERE username = ?;`, username).Scan(&usern)
+							WHERE username = ?
+							AND user_id != ?;`, username, uid).Scan(&usern)
 	res := checkResults(err)
 	if res != SUCCESS {
 		if res == NO_ROWS {
@@ -69,8 +70,8 @@ func (db *appdbimpl) IsUsernameExists(username string) (bool, int, error) {
 
 func (db *appdbimpl) CreateUser(u utils.User) (utils.User, int, error) {
 	res, err := db.c.Exec(`INSERT 
-								INTO users (username, user_name, user_surname) 
-								VALUES (?, ?, ?);`, u.Username, u.Name, u.Surname)
+								INTO users (username)
+								VALUES (?);`, u.Username)
 	if err != nil {
 		return utils.User{}, checkResults(err), err
 	}
@@ -85,10 +86,10 @@ func (db *appdbimpl) CreateUser(u utils.User) (utils.User, int, error) {
 
 func (db *appdbimpl) GetUserProfile(userId int) (utils.User, int, error) {
 	var user utils.User
-	// Get the id, username, name and surname
-	err := db.c.QueryRow(`SELECT user_id, username, user_name, user_surname 
+	// Get the id and username
+	err := db.c.QueryRow(`SELECT user_id, username 
 							FROM users 
-							WHERE user_id = ?;`, userId).Scan(&user.UserID, &user.Username, &user.Name, &user.Surname)
+							WHERE user_id = ?;`, userId).Scan(&user.UserID, &user.Username)
 	if res := checkResults(err); res != SUCCESS {
 		return user, res, err
 	}
@@ -225,7 +226,7 @@ func (db *appdbimpl) GetUserPhotos(uid int) ([]utils.Post, int, error) {
 func (db *appdbimpl) GetUsersByPattern(pattern string, currentUserId int) ([]utils.User, int, error) {
 
 	rows, err := db.c.Query(`
-        SELECT DISTINCT u.user_id, u.username, u.user_name, u.user_surname
+        SELECT DISTINCT u.user_id, u.username
         FROM users u
         WHERE u.username LIKE ? 
         AND u.user_id != ?  
@@ -249,7 +250,7 @@ func (db *appdbimpl) GetUsersByPattern(pattern string, currentUserId int) ([]uti
 	var users []utils.User
 	for rows.Next() {
 		var user utils.User
-		err := rows.Scan(&user.UserID, &user.Username, &user.Name, &user.Surname)
+		err := rows.Scan(&user.UserID, &user.Username)
 		if err != nil {
 			return nil, ERROR, err
 		}

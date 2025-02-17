@@ -42,7 +42,7 @@ import (
 type AppDatabase interface {
 	/* User */
 	GetUserByName(username string) (utils.User, int, error)
-	IsUsernameExists(username string) (bool, int, error)
+	IsUsernameExists(username string, uid int) (bool, int, error)
 	CreateUser(u utils.User) (utils.User, int, error)
 	GetUserProfile(userId int) (utils.User, int, error)
 	GetUserById(id int, currentUserId int) (utils.User, int, error)
@@ -113,9 +113,7 @@ func New(db *sql.DB) (AppDatabase, error) {
 		tableStmts := map[string]string{
 			"users": `CREATE TABLE IF NOT EXISTS users (
 				user_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-				username TEXT NOT NULL UNIQUE CHECK(length(username) > 2 AND length(username) < 17),
-				user_name TEXT NOT NULL,
-				user_surname TEXT NOT NULL	
+				username TEXT NOT NULL UNIQUE CHECK(length(username) > 2 AND length(username) < 17)
 			);`,
 			"posts": `CREATE TABLE IF NOT EXISTS posts(
 				post_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
