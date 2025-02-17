@@ -34,14 +34,14 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   const username = localStorage.getItem('username')
-  
-  // Require both token and username for auth
-  const isAuthenticated = token && username
-  
+  const tokenExpiry = localStorage.getItem('tokenExpiry')
+  const isAuthenticated = token && username && new Date().getTime() < tokenExpiry
+
   if (to.meta.requiresAuth && !isAuthenticated) {
     // Clear potentially corrupt storage
     localStorage.removeItem('token')
     localStorage.removeItem('username')
+    localStorage.removeItem('tokenExpiry')
     next({ name: 'Login' })
   } else if (to.name === 'Login' && isAuthenticated) {
     // Redirect to home if already logged in

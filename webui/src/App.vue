@@ -9,75 +9,75 @@ export default {
   components: {
     Dashboard,
     UploadPhotoModal,
-	SearchModal
+    SearchModal
   },
-	data: function() {
-		return {
-			logged: null,
-			currentUsername: null,
-			usrLink: null,
-		}
-	},
-	watch: {
-		$route (to, from) {
-			this.checkLocalStorage();
-		}
-	},
-	methods: {
-		logout() {
-			window.localStorage.removeItem("token");
-			window.localStorage.removeItem("username");
-			this.$setAuth();
-			this.$router.push({name: 'Login'})
-		},
-		checkLocalStorage() {
-			const storedUsr = window.localStorage.getItem('username');
-			const storedTkn = window.localStorage.getItem('token');
+  data() {
+    return {
+      logged: null,
+      currentUsername: null,
+      usrLink: null,
+    }
+  },
+  watch: {
+    $route(to, from) {
+      this.checkLocalStorage();
+    }
+  },
+  methods: {
+    logout() {
+      window.localStorage.removeItem("token");
+      window.localStorage.removeItem("username");
+      this.$setAuth();
+      this.$router.push({ name: 'Login' });
+    },
+    checkLocalStorage() {
+      const storedUsr = window.localStorage.getItem('username');
+      const storedTkn = window.localStorage.getItem('token');
 
-			if (storedUsr && storedTkn) {
-				try {
-					this.currentUsername = storedUsr;
-					this.logged = true;  // Make sure this is set
-					this.usrLink = `/users/${storedTkn}`; // Use token instead of username
-				} catch (error) {
-					this.handleLogout();
-				}
-			} else {
-				this.logged = false;
-			}
-		},
-		handleLogout() {
-			window.localStorage.removeItem('token');
-			window.localStorage.removeItem('username');
-			this.logged = false;
-			this.currentUsername = null;
-			this.usrLink = null;
-			this.$setAuth();
-			this.$router.push({ name: 'Login' });
-		},
-		openUploadModal() {
-			this.$refs.uploadModal.open()
-		},
-		openSearchModal() {
-			this.$refs.searchModal.open()
-		},
-	},
-	mounted() {
-		this.$setAuth();
-		this.checkLocalStorage();
+      if (storedUsr && storedTkn) {
+        try {
+          this.currentUsername = storedUsr;
+          this.logged = true;
+          this.usrLink = `/users/${storedTkn}`;
+        } catch (error) {
+          this.handleLogout();
+        }
+      } else {
+        this.logged = false;
+        this.$router.push({ name: 'Login' });
+      }
+    },
+    handleLogout() {
+      window.localStorage.removeItem('token');
+      window.localStorage.removeItem('username');
+      this.logged = false;
+      this.currentUsername = null;
+      this.usrLink = null;
+      this.$setAuth();
+      this.$router.push({ name: 'Login' });
+    },
+    openUploadModal() {
+      this.$refs.uploadModal.open();
+    },
+    openSearchModal() {
+      this.$refs.searchModal.open();
+    },
+  },
+  mounted() {
+    this.$setAuth();
+    this.checkLocalStorage();
 
-		this.$axios.interceptors.response.use(response => {
-			return response;
-		}, error => {
-				// If the user is Unauthorized, redirect to login
-			if (error.response.status === 401) {
-				this.$router.push({ name: 'Login' })
-				return;
-			}
-			else 
-				return Promise.reject(error) // Leave other error handlers
-		});
-	}
+    this.$axios.interceptors.response.use(response => {
+      return response;
+    }, error => {
+      if (error.response.status === 401) {
+        this.$router.push({ name: 'Login' });
+        return;
+      } else {
+        return Promise.reject(error);
+      }
+    });
+  }
 }
 </script>
 

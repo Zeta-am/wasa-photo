@@ -78,7 +78,6 @@ type AppDatabase interface {
 	IsBanned(uid int, bannerId int) (bool, int, error)
 	GetBannedList(uid int) ([]utils.User, int, error)
 
-
 	Ping() error
 }
 

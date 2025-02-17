@@ -37,7 +37,6 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(dbUser)
 	if err != nil {
-		ctx.Logger.WithError(err).Error("can't encode the response")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

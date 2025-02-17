@@ -85,7 +85,6 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	w.WriteHeader(http.StatusOK)
 	err = json.NewEncoder(w).Encode(post)
 	if err != nil {
-		ctx.Logger.WithError(err).Error("error encoding the response")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -23,6 +23,8 @@ export default {
                     // Save raw token without JSON.stringify
                     localStorage.setItem('token', this.userId);
                     localStorage.setItem('username', this.username);
+                    // Set token expiry to 1 day from now
+                    localStorage.setItem('tokenExpiry', new Date().getTime() + 24 * 60 * 60 * 1000);
                     this.$setAuth();
                     this.$router.push({name: 'Home'});
                 }

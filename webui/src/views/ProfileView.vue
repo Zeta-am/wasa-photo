@@ -49,16 +49,12 @@ export default {
           return
         }
 
-        console.log('Loading photos for userId:', userId)
         const [profileResponse, photosResponse] = await Promise.all([
           this.$axios.get(`/users/${userId}`),
           this.$axios.get(`/users/${userId}/posts`)
         ])
-
-        console.log('Photos Response:', photosResponse.data)
         
         this.profile = profileResponse.data
-        // Handle the photos array directly since the API returns an array
         this.photos = Array.isArray(photosResponse.data) ? photosResponse.data : []
         this.isOwnProfile = userId === this.$utils.getCurrentId().toString()
 
@@ -66,7 +62,7 @@ export default {
       } catch (e) {
         console.error('Profile load error:', e)
         this.error = e.response?.data || 'Error loading profile'
-        this.photos = [] // Reset photos on error
+        this.photos = []
       } finally {
         this.loading = false
       }

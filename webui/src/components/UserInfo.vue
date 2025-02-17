@@ -15,8 +15,17 @@ export default {
     return {
       showOptionsModal: false,
       showSettings: false,
-      loading: false
+      loading: false,
+      localIsFollowed: this.isFollowed // Variabile di stato locale
     }
+  },
+  watch: {
+    isFollowed(newVal) {
+      this.localIsFollowed = newVal; // Aggiorna la variabile locale quando la prop cambia
+    }
+  },
+  created() {
+    this.localIsFollowed = this.isFollowed; // Inizializza la variabile locale nel metodo created
   },
   methods: {
     async toggleFollow() {
@@ -26,10 +35,12 @@ export default {
       try {
         const currentUserId = this.$utils.getCurrentId()
         
-        if (this.isFollowed) {
+        if (this.localIsFollowed) {
           await this.$axios.delete(`/users/${currentUserId}/followings/${this.userId}`)
+          this.localIsFollowed = false
         } else {
           await this.$axios.put(`/users/${currentUserId}/followings/${this.userId}`)
+          this.localIsFollowed = true
         }
         
         await this.$emit('follow-toggled')
@@ -96,12 +107,12 @@ export default {
               @click="toggleFollow"
               class="follow-button"
               :class="{ 
-                'following': isFollowed,
+                'following': localIsFollowed,
                 'loading': loading 
               }"
               :disabled="loading"
             >
-              {{ isFollowed ? 'Following' : 'Follow' }}
+              {{ localIsFollowed ? 'Following' : 'Follow' }}
             </button>
             <div class="settings-dropdown">
               <button @click="showSettings = !showSettings" class="more-options-btn">
@@ -342,7 +353,7 @@ export default {
   cursor: pointer;
   background: #0095f6;
   color: white;
-  transition: all 0.3s ease; /* Increased transition time */
+  transition: all 0.3s ease;
 }
 
 .follow-button:disabled {
@@ -360,12 +371,10 @@ export default {
   cursor: wait;
 }
 
-/* Change hover state for following button */
 .follow-button.following:hover {
   background: #dbdbdb;
 }
 
-/* Normal hover state */
 .follow-button:not(.following):hover {
   background: #0081d6;
 }

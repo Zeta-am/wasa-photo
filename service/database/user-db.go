@@ -37,35 +37,19 @@ func (db *appdbimpl) GetUserByName(username string) (utils.User, int, error) {
 }
 
 func (db *appdbimpl) GetUserById(id int, currentUserId int) (utils.User, int, error) {
-    query := `
-        SELECT u.user_id, u.username, u.user_name, u.user_surname,
-               (SELECT COUNT(*) FROM posts WHERE user_id = u.user_id) as post_count,
-               (SELECT COUNT(*) FROM follows WHERE followed_id = u.user_id) as follower_count,
-               (SELECT COUNT(*) FROM follows WHERE follower_id = u.user_id) as following_count,
-               EXISTS (
-                   SELECT 1 FROM follows 
-                   WHERE follower_id = ? AND followed_id = u.user_id
-               ) as is_followed
-        FROM users u
-        WHERE u.user_id = ?`
-
-    var user utils.User
-    err := db.c.QueryRow(query, currentUserId, id).Scan(
-        &user.UserID,
-        &user.Username,
-        &user.Name,
-        &user.Surname,
-        &user.PostCount,
-        &user.FollowerCount,
-        &user.FollowingCount,
-        &user.Followed,
-    )
-
-    if err != nil {
-        return utils.User{}, ERROR, err
-    }
-
-    return user, SUCCESS, nil
+	var user utils.User
+	err := db.c.QueryRow(`SELECT user_id, username, user_name, user_surname, 
+        (SELECT COUNT(*) FROM posts WHERE user_id = ?) AS postNo, 
+        (SELECT COUNT(*) FROM follows WHERE followed_id = ?) AS followerNo, 
+        (SELECT COUNT(*) FROM follows WHERE follower_id = ?) AS followingNo, 
+        EXISTS(SELECT 1 FROM follows WHERE follower_id = ? AND followed_id = ?) AS followed 
+        FROM users WHERE user_id = ?`, id, id, id, currentUserId, id, id).Scan(
+		&user.UserID, &user.Username, &user.Name, &user.Surname, &user.PostCount,
+		&user.FollowerCount, &user.FollowingCount, &user.Followed)
+	if err != nil {
+		return user, ERROR, err
+	}
+	return user, SUCCESS, nil
 }
 
 func (db *appdbimpl) IsUsernameExists(username string) (bool, int, error) {
@@ -239,12 +223,12 @@ func (db *appdbimpl) GetUserPhotos(uid int) ([]utils.Post, int, error) {
 }
 
 func (db *appdbimpl) GetUsersByPattern(pattern string, currentUserId int) ([]utils.User, int, error) {
-	// Add logging to debug the query
+
 	rows, err := db.c.Query(`
         SELECT DISTINCT u.user_id, u.username, u.user_name, u.user_surname
         FROM users u
         WHERE u.username LIKE ? 
-        AND u.user_id != ?  -- This should exclude the current user
+        AND u.user_id != ?  
         AND u.user_id NOT IN (
             SELECT b.banned_id 
             FROM bans b 
@@ -255,9 +239,13 @@ func (db *appdbimpl) GetUsersByPattern(pattern string, currentUserId int) ([]uti
 	if err != nil {
 		return nil, ERROR, err
 	}
-	defer rows.Close()
 
-	// Add debug logging
+	defer func() {
+		if errow := rows.Close(); errow != nil {
+			err = errow
+		}
+	}()
+
 	var users []utils.User
 	for rows.Next() {
 		var user utils.User

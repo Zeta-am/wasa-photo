@@ -71,5 +71,8 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 
 	// Return response
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(user)
+	if err = json.NewEncoder(w).Encode(user); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
