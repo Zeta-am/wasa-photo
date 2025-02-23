@@ -3,7 +3,17 @@ package database
 import "github.com/Zeta-am/wasa-photo/service/utils"
 
 func (db *appdbimpl) FollowUser(uid int, followedId int) (int, error) {
-	_, err := db.c.Exec(`INSERT INTO follows (follower_id, followed_id) VALUES (?, ?)`,
+	var exists int
+	err := db.c.QueryRow("SELECT COUNT(*) FROM follows WHERE follower_id = ? AND followed_id = ?", uid, followedId).Scan(&exists)
+	if err != nil {
+		return ERROR, err
+	}
+
+	if exists > 0 {
+		return UNIQUE_FAILED, err
+	}
+
+	_, err = db.c.Exec(`INSERT INTO follows (follower_id, followed_id) VALUES (?, ?)`,
 		uid, followedId)
 
 	if err != nil {
@@ -14,6 +24,16 @@ func (db *appdbimpl) FollowUser(uid int, followedId int) (int, error) {
 }
 
 func (db *appdbimpl) UnfollowUser(uid int, unfollowedId int) (int, error) {
+	var exists int
+	err := db.c.QueryRow("SELECT COUNT(*) FROM follows WHERE follower_id = ? AND followed_id = ?", uid, unfollowedId).Scan(&exists) 
+	if err != nil {
+		return ERROR, err
+	}
+
+	if exists == 0 {
+		return UNIQUE_FAILED, nil
+	}
+
 	result, err := db.c.Exec(`DELETE FROM follows WHERE follower_id = ? AND followed_id = ?`,
 		uid, unfollowedId)
 

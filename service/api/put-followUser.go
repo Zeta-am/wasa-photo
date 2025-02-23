@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -55,9 +56,15 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
+	log.Printf("Tentativo di follow: %d -> %d", uid, followUid)
+
 	// Follow the user
 	res, err := rt.db.FollowUser(uid, followUid)
-	if res != database.SUCCESS {
+	if res == database.UNIQUE_FAILED {
+		http.Error(w, err.Error(), http.StatusConflict)
+		return
+	}
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -65,6 +72,10 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	// Get updated user profile with correct followed status
 	user, res, err := rt.db.GetUserById(followUid, uid)
 	if res != database.SUCCESS {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

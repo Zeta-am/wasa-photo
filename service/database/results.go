@@ -13,6 +13,7 @@ const (
 	ERROR
 	NO_ROWS
 	UNIQUE_FAILED
+	
 )
 
 func checkResults(err error) int {

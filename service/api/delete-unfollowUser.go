@@ -40,6 +40,11 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
+	if res == database.UNIQUE_FAILED {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
 	// Get updated user profile with correct followed status
 	user, res, err := rt.db.GetUserById(unfollowUid, uid)
 	if res != database.SUCCESS {

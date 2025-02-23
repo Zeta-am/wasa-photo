@@ -181,6 +181,9 @@ export default {
       localStorage.removeItem('lastVisitedProfile')
     }
     next()
+  },
+  updateFollowState(newFollowState) {
+    this.profile.isFollowed = newFollowState;
   }
 }
 </script>
@@ -206,13 +209,13 @@ export default {
               :followingCount="profile.followingNo"
               :isOwnProfile="isOwnProfile"
               :profileImage="profile.profileImage"
-              :isFollowed="profile.followed"
+              :isFollowed="profile.isFollowed"
               :userId="profile.id"
               @edit-username="openChangeUsername"
               @show-followers="showFollowers"
               @show-following="showFollowing"
               @profile-updated="loadProfileData"
-              @follow-toggled="loadProfileData"
+              @follow-toggled="updateFollowState"
               @show-banned-list="$refs.bannedListModal.open()"
               @toggle-ban="toggleBan"
             />

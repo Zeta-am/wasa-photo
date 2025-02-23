@@ -43,7 +43,7 @@ export default {
           this.localIsFollowed = true
         }
         
-        await this.$emit('follow-toggled')
+        this.$emit('follow-toggled', this.localIsFollowed);
       } catch (e) {
         console.error('Error toggling follow:', e)
       } finally {
