@@ -28,24 +28,29 @@ export default {
     this.localIsFollowed = this.isFollowed; // Inizializza la variabile locale nel metodo created
   },
   methods: {
-    async toggleFollow() {
+    async followUser() {
       if (this.loading) return
       
       this.loading = true
       try {
-        const currentUserId = this.$utils.getCurrentId()
-        
-        if (this.localIsFollowed) {
-          await this.$axios.delete(`/users/${currentUserId}/followings/${this.userId}`)
-          this.localIsFollowed = false
-        } else {
-          await this.$axios.put(`/users/${currentUserId}/followings/${this.userId}`)
-          this.localIsFollowed = true
-        }
-        
-        this.$emit('follow-toggled', this.localIsFollowed);
+        await this.$emit('follow-user')
+        this.localIsFollowed = true; // Aggiorna lo stato locale
       } catch (e) {
-        console.error('Error toggling follow:', e)
+        console.error('Error following user:', e)
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async unfollowUser() {
+      if (this.loading) return
+      
+      this.loading = true
+      try {
+        await this.$emit('unfollow-user')
+        this.localIsFollowed = false; // Aggiorna lo stato locale
+      } catch (e) {
+        console.error('Error unfollowing user:', e)
       } finally {
         this.loading = false
       }
@@ -104,29 +109,21 @@ export default {
           <!-- Other profile controls -->
           <div v-else class="action-buttons">
             <button
-              @click="toggleFollow"
-              class="follow-button"
-              :class="{ 
-                'following': localIsFollowed,
-                'loading': loading 
-              }"
+              v-if="!localIsFollowed"
+              @click="followUser"
+              class="btn btn-primary"
               :disabled="loading"
             >
-              {{ localIsFollowed ? 'Following' : 'Follow' }}
+              Follow
             </button>
-            <div class="settings-dropdown">
-              <button @click="showSettings = !showSettings" class="more-options-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                  <circle cx="12" cy="6" r="2"/>
-                  <circle cx="12" cy="12" r="2"/>
-                </svg>
-              </button>
-              <div v-if="showSettings" class="settings-menu">
-                <button @click="handleBan" class="settings-item text-danger">
-                  Ban User
-                </button>
-              </div>
-            </div>
+            <button
+              v-else
+              @click="unfollowUser"
+              class="btn btn-secondary"
+              :disabled="loading"
+            >
+              Following
+            </button>
           </div>
         </div>
 

@@ -26,7 +26,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	// Get the user id you want to follow
+	// Get the user id you want to unfollow
 	unfollowUid, err := strconv.Atoi(ps.ByName("idFollowed"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -35,19 +35,22 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 
 	// Unfollow the user
 	res, err := rt.db.UnfollowUser(uid, unfollowUid)
-	if res != database.SUCCESS {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if res == database.UNIQUE_FAILED {
+		http.Error(w, "User not followed", http.StatusNotFound)
 		return
 	}
-
-	if res == database.UNIQUE_FAILED {
-		http.Error(w, err.Error(), http.StatusNotFound)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Get updated user profile with correct followed status
 	user, res, err := rt.db.GetUserById(unfollowUid, uid)
 	if res != database.SUCCESS {
+		http.Error(w, "Error retrieving user profile", http.StatusInternalServerError)
+		return
+	}
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -174,17 +174,43 @@ export default {
       localStorage.removeItem('username')
       this.$setAuth()
       this.$router.push({ name: 'Login' })
-    }
+    },
+
+    beforeRouteLeave(to, from, next) {
+      if (to.name === 'home') {
+        localStorage.removeItem('lastVisitedProfile')
+      }
+      next()
+    },
+
+    updateFollowState(newFollowState, followerChange) {
+      this.profile.isFollowed = newFollowState;
+      this.profile.followerCount += followerChange;
+      this.loadProfileData();
+    },
+
+    async followUser() {
+      try {
+        const userId = this.$route.params.userId
+        const response = await this.$axios.put(`/users/${this.$utils.getCurrentId()}/followings/${userId}`)
+        this.profile.isFollowed = true
+        this.profile.followerCount += 1
+      } catch (e) {
+        this.error = e.response?.data || 'Error following user'
+      }
+    },
+
+    async unfollowUser() {
+      try {
+        const userId = this.$route.params.userId
+        const response = await this.$axios.delete(`/users/${this.$utils.getCurrentId()}/followings/${userId}`)
+        this.profile.isFollowed = false
+        this.profile.followerCount -= 1
+      } catch (e) {
+        this.error = e.response?.data || 'Error unfollowing user'
+      }
+    },
   },
-  beforeRouteLeave(to, from, next) {
-    if (to.name === 'home') {
-      localStorage.removeItem('lastVisitedProfile')
-    }
-    next()
-  },
-  updateFollowState(newFollowState) {
-    this.profile.isFollowed = newFollowState;
-  }
 }
 </script>
 
@@ -215,7 +241,8 @@ export default {
               @show-followers="showFollowers"
               @show-following="showFollowing"
               @profile-updated="loadProfileData"
-              @follow-toggled="updateFollowState"
+              @follow-user="followUser"
+              @unfollow-user="unfollowUser"
               @show-banned-list="$refs.bannedListModal.open()"
               @toggle-ban="toggleBan"
             />

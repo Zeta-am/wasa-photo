@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"log"
 
 	"github.com/Zeta-am/wasa-photo/service/utils"
 )
@@ -255,7 +254,7 @@ func (db *appdbimpl) GetUsersByPattern(pattern string, currentUserId int) ([]uti
 			return nil, ERROR, err
 		}
 		// Debug log
-		log.Printf("Found user: ID=%d, Username=%s", user.UserID, user.Username)
+
 		users = append(users, user)
 	}
 
