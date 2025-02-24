@@ -1,13 +1,13 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
+<script>
 import UploadPhotoModal from '@/components/UploadPhotoModal.vue'
 import SearchModal from './components/SearchModal.vue';
-</script>
-<script>
+import Dashboard from '@/components/Dashboard.vue';
+
 export default {
   components: {
     UploadPhotoModal,
-    SearchModal
+    SearchModal,
+    Dashboard
   },
   data() {
     return {
@@ -81,7 +81,15 @@ export default {
 
 <template>
   <div class="container-fluid h-100">
-    <main :class="['px-md-4', 'w-100']">
+    <Dashboard 
+      v-if="logged" 
+      :username="currentUsername" 
+      :usrLink="usrLink" 
+      @logout="logout" 
+      @open-upload="openUploadModal" 
+      @open-search="openSearchModal" 
+    />
+    <main :class="['px-md-4', 'w-100']" :style="{ paddingLeft: logged ? '60px' : '0' }">
       <RouterView />
     </main>
     <UploadPhotoModal ref="uploadModal" />

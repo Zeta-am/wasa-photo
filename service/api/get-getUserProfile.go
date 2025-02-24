@@ -21,7 +21,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Get the user from database
-	dbUser, res, err := rt.db.GetUserProfile(uid)
+	dbUser, res, err := rt.db.GetUserById(uid, uid)
 	if res == database.ERROR {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

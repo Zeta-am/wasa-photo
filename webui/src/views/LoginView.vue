@@ -23,8 +23,8 @@ export default {
                     // Save raw token without JSON.stringify
                     localStorage.setItem('token', this.userId);
                     localStorage.setItem('username', this.username);
-                    // Set token expiry to 1 day from now
-                    localStorage.setItem('tokenExpiry', new Date().getTime() + 24 * 60 * 60 * 1000);
+                    // Set token expiry to 1 hour from now
+                    localStorage.setItem('tokenExpiry', new Date().getTime() + 1 * 60 * 60 * 1000);
                     this.$setAuth();
                     this.$router.push({name: 'Home'});
                 }
@@ -48,6 +48,13 @@ export default {
         // Check if the user is already logged in
         if (currId) {
             this.$router.push({name: 'Home'});
+        } else {
+            // Clear potentially corrupt storage
+            localStorage.removeItem('token')
+            localStorage.removeItem('username')
+            localStorage.removeItem('tokenExpiry')
+            localStorage.removeItem('nickname')
+            localStorage.removeItem('UserID')
         }
     }
 }

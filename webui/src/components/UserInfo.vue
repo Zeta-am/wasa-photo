@@ -16,16 +16,13 @@ export default {
       showOptionsModal: false,
       showSettings: false,
       loading: false,
-      localIsFollowed: this.isFollowed // Variabile di stato locale
+      localIsFollowed: this.isFollowed // Aggiungi questa linea
     }
   },
   watch: {
     isFollowed(newVal) {
       this.localIsFollowed = newVal; // Aggiorna la variabile locale quando la prop cambia
     }
-  },
-  created() {
-    this.localIsFollowed = this.isFollowed; // Inizializza la variabile locale nel metodo created
   },
   methods: {
     async followUser() {
@@ -34,7 +31,7 @@ export default {
       this.loading = true
       try {
         await this.$emit('follow-user')
-        this.localIsFollowed = true; // Aggiorna lo stato locale
+        this.localIsFollowed = true // Usa la variabile locale
       } catch (e) {
         console.error('Error following user:', e)
       } finally {
@@ -48,7 +45,7 @@ export default {
       this.loading = true
       try {
         await this.$emit('unfollow-user')
-        this.localIsFollowed = false; // Aggiorna lo stato locale
+        this.localIsFollowed = false // Usa la variabile locale
       } catch (e) {
         console.error('Error unfollowing user:', e)
       } finally {
@@ -109,7 +106,7 @@ export default {
           <!-- Other profile controls -->
           <div v-else class="action-buttons">
             <button
-              v-if="!localIsFollowed"
+              v-if="!localIsFollowed" 
               @click="followUser"
               class="btn btn-primary"
               :disabled="loading"

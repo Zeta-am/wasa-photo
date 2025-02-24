@@ -193,10 +193,10 @@ export default {
       try {
         const userId = this.$route.params.userId
         const response = await this.$axios.put(`/users/${this.$utils.getCurrentId()}/followings/${userId}`)
-        this.profile.isFollowed = true
         this.profile.followerCount += 1
       } catch (e) {
         this.error = e.response?.data || 'Error following user'
+        console.error('Follow error:', e);
       }
     },
 
@@ -204,10 +204,10 @@ export default {
       try {
         const userId = this.$route.params.userId
         const response = await this.$axios.delete(`/users/${this.$utils.getCurrentId()}/followings/${userId}`)
-        this.profile.isFollowed = false
         this.profile.followerCount -= 1
       } catch (e) {
         this.error = e.response?.data || 'Error unfollowing user'
+        console.error('Unfollow error:', e);
       }
     },
   },
@@ -216,13 +216,6 @@ export default {
 
 <template>
   <div class="profile-container">
-    <Dashboard 
-      :username="username"
-      :usrLink="usrLink"
-      @logout="logout"
-      @open-upload="$parent.openUploadModal"
-      @open-search="$parent.openSearchModal"
-    />
     <div class="profile-view">
       <ErrorMsg v-if="error" :msg="error"/>
       <LoadingSpinner :loading="loading">

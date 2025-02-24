@@ -16,13 +16,6 @@
     </div>
     <SearchModal ref="searchModal" />
     <div class="home-container">
-      <Dashboard 
-        :username="username"
-        :usrLink="usrLink"
-        @logout="logout"
-        @open-upload="$parent.openUploadModal"
-        @open-search="$parent.openSearchModal"
-      />
       <!-- resto del contenuto della home -->
     </div>
   </main>
