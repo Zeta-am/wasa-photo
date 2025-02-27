@@ -7,49 +7,38 @@ export default {
     followingCount: Number,
     isOwnProfile: Boolean,
     profileImage: String,
-    isFollowed: Boolean,
     userId: Number,
-    isBanned: Boolean
+    isBanned: Boolean,
+    isFollowed: {
+      type: Boolean, 
+      default: false
+    }
   },
   data() {
     return {
       showOptionsModal: false,
       showSettings: false,
-      loading: false,
-      localIsFollowed: this.isFollowed // Aggiungi questa linea
+      loading: false
     }
   },
-  watch: {
-    isFollowed(newVal) {
-      this.localIsFollowed = newVal; // Aggiorna la variabile locale quando la prop cambia
+  computed: {
+    followButtonText() {
+      return this.isFollowed ? 'Following' : 'Follow';
     }
   },
   methods: {
-    async followUser() {
-      if (this.loading) return
-      
-      this.loading = true
+    async toggleFollow() {
+      this.loading = true;
       try {
-        await this.$emit('follow-user')
-        this.localIsFollowed = true // Usa la variabile locale
+        if (this.isFollowed) {
+          this.$emit('unfollow-user');
+        } else {
+          this.$emit('follow-user');
+        }
       } catch (e) {
-        console.error('Error following user:', e)
+        console.error('Follow error:', e);
       } finally {
-        this.loading = false
-      }
-    },
-
-    async unfollowUser() {
-      if (this.loading) return
-      
-      this.loading = true
-      try {
-        await this.$emit('unfollow-user')
-        this.localIsFollowed = false // Usa la variabile locale
-      } catch (e) {
-        console.error('Error unfollowing user:', e)
-      } finally {
-        this.loading = false
+        this.loading = false;
       }
     }
   }
@@ -106,20 +95,12 @@ export default {
           <!-- Other profile controls -->
           <div v-else class="action-buttons">
             <button
-              v-if="!localIsFollowed" 
-              @click="followUser"
-              class="btn btn-primary"
+              @click="toggleFollow"
+              class="btn"
+              :class="isFollowed ? 'btn-secondary' : 'btn-primary'"
               :disabled="loading"
             >
-              Follow
-            </button>
-            <button
-              v-else
-              @click="unfollowUser"
-              class="btn btn-secondary"
-              :disabled="loading"
-            >
-              Following
+            {{ followButtonText }}
             </button>
           </div>
         </div>

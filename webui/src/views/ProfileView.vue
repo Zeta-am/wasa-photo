@@ -63,15 +63,18 @@ export default {
           this.$axios.get(`/users/${userId}`),
           this.$axios.get(`/users/${userId}/posts`)
         ])
-        
-        this.profile = profileResponse.data
+
+        this.profile = {
+          ...profileResponse.data,
+          isFollowed: profileResponse.data.followed
+        }
         this.photos = Array.isArray(photosResponse.data) ? photosResponse.data : []
         this.isOwnProfile = userId === this.$utils.getCurrentId().toString()
 
         localStorage.setItem('lastVisitedProfile', userId)
       } catch (e) {
         console.error('Profile load error:', e)
-        this.error = e.response?.data || 'Error loading profile'
+        this.error = e.response ? e.response.data : 'Error loading profile'
         this.photos = []
       } finally {
         this.loading = false
@@ -183,17 +186,18 @@ export default {
       next()
     },
 
-    updateFollowState(newFollowState, followerChange) {
-      this.profile.isFollowed = newFollowState;
-      this.profile.followerCount += followerChange;
-      this.loadProfileData();
-    },
+    // updateFollowState(newFollowState, followerChange) {
+    //   this.profile.isFollowed = newFollowState;
+    //   this.profile.followerCount += followerChange;
+    //   this.loadProfileData();
+    // },
 
     async followUser() {
       try {
         const userId = this.$route.params.userId
-        const response = await this.$axios.put(`/users/${this.$utils.getCurrentId()}/followings/${userId}`)
-        this.profile.followerCount += 1
+        await this.$axios.put(`/users/${this.$utils.getCurrentId()}/followings/${userId}`)
+        this.profile.followerNo++
+        this.profile.isFollowed = true
       } catch (e) {
         this.error = e.response?.data || 'Error following user'
         console.error('Follow error:', e);
@@ -203,8 +207,9 @@ export default {
     async unfollowUser() {
       try {
         const userId = this.$route.params.userId
-        const response = await this.$axios.delete(`/users/${this.$utils.getCurrentId()}/followings/${userId}`)
-        this.profile.followerCount -= 1
+        await this.$axios.delete(`/users/${this.$utils.getCurrentId()}/followings/${userId}`)
+        this.profile.followerNo--
+        this.profile.isFollowed = false
       } catch (e) {
         this.error = e.response?.data || 'Error unfollowing user'
         console.error('Unfollow error:', e);
