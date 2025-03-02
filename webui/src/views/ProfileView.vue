@@ -374,4 +374,17 @@ export default {
 .home-container, .profile-container {
   padding-left: 60px; /* larghezza della dashboard */
 }
+
+.photo-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 </style>

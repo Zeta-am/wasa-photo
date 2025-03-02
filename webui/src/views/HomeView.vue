@@ -1,22 +1,33 @@
 <template>
   <main class="container h-100 d-flex align-items-center justify-content-center">
-    <div class="text-center">
+    <div class="text-center" v-if="posts.length === 0">
       <ErrorMsg v-if="errormsg" :msg="errormsg"/>
-      
-      <div class="mt-4">
-        <p class="text-muted">
-          Non ci sono post da visualizzare. 
+    </div>
+    <SearchModal ref="searchModal" />
+    <div class="home-container">
+      <ErrorMsg v-if="errorMsg" :msg="errorMsg" @close-error="errorMsg = ''" />
+      <LoadingSpinner :loading="isLoading" />
+
+      <div class="post-list">
+        <PostCard
+          v-for="(post, index) in posts"
+          :key="index"
+          :post="post"
+        />
+      </div>
+      <div v-if="posts.length === 0" class="row">
+        <div class="mt-4 centered-content">
+          <p class="text-muted">
+            Non ci sono post da visualizzare. 
           <br>
-          Questo può essere dovuto al fatto che non segui ancora nessuno o che le persone che segui non hanno ancora pubblicato contenuti.
-        </p>
+            Questo può essere dovuto al fatto che non segui ancora nessuno o che le persone che segui non hanno ancora pubblicato contenuti.
+          </p>
         <button @click="openSearch" class="btn btn-primary mt-3">
           Cerca persone da seguire
         </button>
       </div>
-    </div>
-    <SearchModal ref="searchModal" />
-    <div class="home-container">
-      <!-- resto del contenuto della home -->
+    
+      </div>
     </div>
   </main>
 </template>
@@ -24,15 +35,20 @@
 <script>
 import SearchModal from '@/components/SearchModal.vue'
 import Dashboard from '@/components/Dashboard.vue'
+import PostCard from '@/components/PostCard.vue'
 
 export default {
   components: {
     SearchModal,
-    Dashboard
+    Dashboard,
+    PostCard
   },
   data() {
     return {
-      errormsg: null
+      errormsg: null,
+      posts: [],
+      errorMsg: "",
+      isLoading: false
     }
   },
   created() {
@@ -56,7 +72,30 @@ export default {
       localStorage.removeItem('username')
       this.$setAuth()
       this.$router.push({ name: 'Login' })
+    },
+    async getMyStream() {
+      this.isLoading = true;
+      try {
+        const userId = this.$utils.getCurrentId();
+        const response = await this.$axios.get(`/users/${userId}/stream`);
+        if (response.data) {
+          this.posts = response.data;
+        } else {
+          this.posts = [];
+        }
+      } catch (e) {
+        this.errorMsg = 'Error loading stream';
+        console.error(e.toString());
+      } finally {
+        this.isLoading = false;
+      }
     }
+  },
+  mounted() {
+    if (!localStorage.token) {
+      this.$router.replace('/login');
+    }
+    this.getMyStream();
   }
 }
 </script>
@@ -69,5 +108,40 @@ main {
 
 .home-container, .profile-container {
   padding-left: 60px; /* larghezza della dashboard */
+}
+
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.d-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.centered-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.photo-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 </style>
