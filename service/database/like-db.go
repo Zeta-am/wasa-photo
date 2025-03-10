@@ -25,10 +25,10 @@ func (db *appdbimpl) UnlikePhoto(uid int, pid int) (int, error) {
 	return SUCCESS, nil
 }
 
-func (db *appdbimpl) GetLikes(uid int, pid int) ([]utils.Like, int, error) {
-	rows, err := db.c.Query(`SELECT * 
+func (db *appdbimpl) GetLikes(pid int) ([]utils.Like, int, error) {
+	rows, err := db.c.Query(`SELECT user_id, post_id 
 								FROM likes
-								WHERE user_id = ? AND post_id = ?`, uid, pid)
+								WHERE post_id = ?`, pid)
 	if res := checkResults(err); res != SUCCESS {
 		return nil, res, err
 	}

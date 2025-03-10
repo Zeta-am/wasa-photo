@@ -1,6 +1,8 @@
 package database
 
-import "github.com/Zeta-am/wasa-photo/service/utils"
+import (
+	"github.com/Zeta-am/wasa-photo/service/utils"
+)
 
 func (db *appdbimpl) CreateComment(c utils.Comment) (int, int, error) {
 	var cid int
@@ -24,30 +26,25 @@ func (db *appdbimpl) DeleteComment(cid int, pid int, uid int) (int, error) {
 	return SUCCESS, nil
 }
 
-func (db *appdbimpl) GetComments(uid, pid int) ([]utils.Comment, int, error) {
-	rows, err := db.c.Query(`
-        SELECT c.comment_id, c.post_id, c.user_id, c.caption, c.timestamp, u.username
-        FROM comments c
-        JOIN users u ON c.user_id = u.user_id
-        WHERE c.post_id = ?
-        ORDER BY c.timestamp DESC`, pid)
+func (db *appdbimpl) GetComments(uid int, pid int) ([]utils.Comment, int, error) {
+	rows, err := db.c.Query(`SELECT c.comm_id, c.user_id, u.username, c.post_id, c.timestamp, c.caption
+							 FROM comments c
+							 INNER JOIN users u ON c.user_id = u.user_id
+							 WHERE c.post_id = ?
+							 ORDER BY c.timestamp ASC`, pid)
 	if err != nil {
 		return nil, ERROR, err
 	}
-	defer rows.Close()
+	defer func() {
+		if closeErr := rows.Close(); closeErr != nil {
+			err = closeErr
+		}
+	}()
 
 	var comments []utils.Comment
 	for rows.Next() {
 		var comment utils.Comment
-		err := rows.Scan(
-			&comment.CommentID,
-			&comment.PostID,
-			&comment.UserID,
-			&comment.Caption,
-			&comment.Timestamp,
-			&comment.Username,
-		)
-		if err != nil {
+		if err := rows.Scan(&comment.CommentID, &comment.UserID, &comment.Username, &comment.PostID, &comment.Timestamp, &comment.Caption); err != nil {
 			return nil, ERROR, err
 		}
 		comments = append(comments, comment)
@@ -56,6 +53,6 @@ func (db *appdbimpl) GetComments(uid, pid int) ([]utils.Comment, int, error) {
 	if err = rows.Err(); err != nil {
 		return nil, ERROR, err
 	}
-	
+
 	return comments, SUCCESS, nil
 }

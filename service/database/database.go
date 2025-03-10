@@ -64,7 +64,7 @@ type AppDatabase interface {
 	/* Like */
 	LikePhoto(uid int, pid int) (utils.Like, int, error)
 	UnlikePhoto(uid int, pid int) (int, error)
-	GetLikes(uid int, pid int) ([]utils.Like, int, error)
+	GetLikes(pid int) ([]utils.Like, int, error)
 
 	/* Follow */
 	FollowUser(uid int, followedId int) (int, error)

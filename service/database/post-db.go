@@ -12,12 +12,38 @@ func (db *appdbimpl) CreatePost(p utils.Post) (int, int, error) {
 }
 
 func (db *appdbimpl) DeletePost(pid int) (int, error) {
-	_, err := db.c.Exec(`DELETE
-								FROM posts
-								WHERE post_id = ?`, pid)
-	if res := checkResults(err); res != SUCCESS {
-		return res, err
+	// Inizia una transazione
+	tx, err := db.c.Begin()
+	if err != nil {
+		return ERROR, err
 	}
+
+	// Elimina prima i commenti collegati
+	_, err = tx.Exec(`DELETE FROM comments WHERE post_id = ?`, pid)
+	if err != nil {
+		tx.Rollback()
+		return ERROR, err
+	}
+
+	// Elimina i like collegati
+	_, err = tx.Exec(`DELETE FROM likes WHERE post_id = ?`, pid)
+	if err != nil {
+		tx.Rollback()
+		return ERROR, err
+	}
+
+	// Elimina il post
+	_, err = tx.Exec(`DELETE FROM posts WHERE post_id = ?`, pid)
+	if err != nil {
+		tx.Rollback()
+		return ERROR, err
+	}
+
+	// Commit della transazione
+	if err = tx.Commit(); err != nil {
+		return ERROR, err
+	}
+
 	return SUCCESS, nil
 }
 

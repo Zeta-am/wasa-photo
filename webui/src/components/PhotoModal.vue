@@ -26,6 +26,11 @@ export default {
       await this.loadData();
     }
   },
+  async mounted() {
+    if (this.photo?.id) {
+      await this.loadData();
+    }
+  },
   methods: {
     async loadData() {
       this.error = null;
@@ -44,7 +49,8 @@ export default {
           const likesRes = await this.$axios.get(`/users/${userId}/posts/${this.photo.id}/likes`);
           this.likes = likesRes.data || [];
           this.likeCount = this.likes.length;
-          this.isLiked = this.likes.some(like => like.userId === this.currentUserId);
+          // Usa l'uguaglianza non stretta per evitare problemi di tipo
+          this.isLiked = this.likes.some(like => like.userId == this.currentUserId);
         } catch (e) {
           this.error = 'Error loading likes';
           this.likes = [];
@@ -75,6 +81,8 @@ export default {
           this.likeCount--;
           this.isLiked = false;
         }
+        // Emetti l'evento per il nuovo stato dei like
+        this.$emit('like-updated', { likeCount: this.likeCount, isLiked: this.isLiked });
       } catch (e) {
         this.error = 'Error updating like';
       }
@@ -92,12 +100,14 @@ export default {
         this.comments.push({
           id: response.data.id,
           userId: this.currentUserId,
-          username: this.username,
-          text: this.newComment,
+          username: this.$utils.getCurrentUsername(),
+          caption: this.newComment,
           timestamp: new Date().toISOString()
         });
         
         this.newComment = '';
+        // Emetti l'evento con il nuovo conteggio dei commenti
+        this.$emit('comment-updated', { commentCount: this.comments.length });
       } catch (e) {
         console.error('Error adding comment:', e);
       }
@@ -107,6 +117,8 @@ export default {
         const userId = this.$utils.getCurrentId();
         await this.$axios.delete(`/users/${userId}/posts/${this.photo.id}/comments/${commentId}`);
         this.comments = this.comments.filter(c => c.id !== commentId);
+        // Emetti l'evento con il nuovo conteggio dei commenti
+        this.$emit('comment-updated', { commentCount: this.comments.length });
       } catch (e) {
         console.error('Error deleting comment:', e);
       }
@@ -173,9 +185,9 @@ export default {
           <div class="comments-list" v-if="comments && comments.length > 0">
             <div v-for="comment in comments" :key="comment.id" class="comment">
               <span class="username">{{ comment.username }}</span>
-              <span class="comment-text">{{ comment.text }}</span>
+              <span class="comment-text">{{ comment.caption }}</span>
               <button 
-                v-if="comment.userId === currentUserId" 
+                v-if="comment.userId == currentUserId" 
                 class="delete-comment"
                 @click="deleteComment(comment.id)"
               >
@@ -260,7 +272,6 @@ export default {
   height: 90vh;
   border-radius: 4px;
   overflow: hidden;
-  margin: auto;
 }
 
 .photo-side {
@@ -268,12 +279,11 @@ export default {
   background: black;
   display: flex;
   align-items: center;
-  justify-content: center;
 }
 
 .photo-side img {
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
@@ -315,11 +325,19 @@ export default {
 .delete-comment {
   position: absolute;
   right: 0;
-  top: 0;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
-  color: #8e8e8e;
+  color: #ed4956;
   cursor: pointer;
+  font-size: 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.comment:hover .delete-comment {
+  opacity: 1;
 }
 
 .actions-section {

@@ -14,8 +14,8 @@ type Post struct {
 	Image        string `json:"image"`
 	UserID       int    `json:"user-id"`
 	Username     string `json:"username"`
-	LikeCount    int    `json:"like-numbers"`
-	CommentCount int    `json:"comment-numbers"`
+	LikeCount    int    `json:"likeCount"`
+	CommentCount int    `json:"commentCount"` // modificato da "comment-numbers" a "commentCount"
 	Timestamp    string `json:"upload-time"`
 	Liked        bool   `json:"liked"`
 	Caption      string `json:"caption"`
