@@ -10,7 +10,7 @@ export default {
     return {
       show: false,
       searchQuery: '',
-      results: [],
+      results: [], // Assicurati sia inizializzato come array
       loading: false,
       timeout: null
     }
@@ -22,7 +22,7 @@ export default {
     close() {
       this.show = false
       this.searchQuery = ''
-      this.results = []
+      this.results = [] // Reset sempre a un array vuoto
     },
     handleInput() {
       clearTimeout(this.timeout)
@@ -37,7 +37,6 @@ export default {
       }
       
       this.loading = true
-      console.log('Searching for:', this.searchQuery) // Debug log
       
       try {
         const response = await this.$axios.get('/users', {
@@ -45,10 +44,9 @@ export default {
             username: this.searchQuery
           }
         })
-        console.log('API Response:', response) // Debug log
-        this.results = response.data.users
+        // Forza il valore in results ad essere un array
+        this.results = Array.isArray(response.data.users) ? response.data.users : []
       } catch (error) {
-        console.error('Search error:', error)
         this.results = []
       } finally {
         this.loading = false

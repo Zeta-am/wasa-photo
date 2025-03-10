@@ -18,7 +18,8 @@ export default {
     return {
       showOptionsModal: false,
       showSettings: false,
-      loading: false
+      loading: false,
+      showBanModal: false  
     }
   },
   computed: {
@@ -40,6 +41,27 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    openBanModal() {
+      this.showBanModal = true;
+    },
+    closeBanModal() {
+      this.showBanModal = false;
+    },
+    async handleBan() {
+      try {
+        // Chiamata API per bannare l'utente visualizzato
+        await this.$axios.put(`/users/${this.$utils.getCurrentId()}/banList/${this.userId}`)
+        // Chiudi il modal
+        this.closeBanModal()
+        // Ridireziona alla home
+        this.$router.push({ name: 'Home' })
+      } catch (e) {
+        console.error('Error banning user:', e)
+      }
+    },
+    handleProfileUpload(event) {
+      // ...existing code...
     }
   }
 }
@@ -102,6 +124,11 @@ export default {
             >
             {{ followButtonText }}
             </button>
+            <button class="ban-btn" @click="openBanModal">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -143,6 +170,17 @@ export default {
           <button class="option-item cancel" @click="closeOptionsModal">
             Cancel
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal per il ban -->
+    <div v-if="showBanModal" class="ban-modal" @click.self="closeBanModal">
+      <div class="modal-content">
+        <h6>Ban this user?</h6>
+        <div class="modal-actions">
+          <button class="btn btn-danger" @click="handleBan">Ban user</button>
+          <button class="btn btn-secondary" @click="closeBanModal">Cancel</button>
         </div>
       </div>
     </div>
@@ -445,5 +483,36 @@ export default {
 
 .settings-item:hover {
   background: #fafafa;
+}
+
+.ban-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 8px;
+}
+.ban-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.ban-modal .modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  width: 300px;
+  text-align: center;
+}
+.modal-actions {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
 }
 </style>

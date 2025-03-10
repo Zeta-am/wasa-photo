@@ -26,7 +26,8 @@ export default {
       showList: false,
       listTitle: '',
       userList: [],
-      selectedFile: null
+      selectedFile: null,
+      cancelSource: null
     }
   },
   created() {
@@ -50,34 +51,34 @@ export default {
   },
   methods: {
     async loadProfileData() {
-      this.loading = true
-      this.error = null
-      
+      this.loading = true;
+      // Resetta i dati prima di caricare il nuovo profilo
+      this.error = "";
+      this.profile = null;
       try {
-        const userId = this.$route.params.userId
+        const userId = this.$route.params.userId;
         if (!userId || this.$route.name === 'home') {
-          return
+          return;
         }
-
+    
         const [profileResponse, photosResponse] = await Promise.all([
           this.$axios.get(`/users/${userId}`),
           this.$axios.get(`/users/${userId}/posts`)
-        ])
-
+        ]);
+    
         this.profile = {
           ...profileResponse.data,
           isFollowed: profileResponse.data.followed
-        }
-        this.photos = Array.isArray(photosResponse.data) ? photosResponse.data : []
-        this.isOwnProfile = userId === this.$utils.getCurrentId().toString()
-
-        localStorage.setItem('lastVisitedProfile', userId)
+        };
+        this.photos = Array.isArray(photosResponse.data) ? photosResponse.data : [];
+        this.isOwnProfile = userId === this.$utils.getCurrentId().toString();
       } catch (e) {
-        console.error('Profile load error:', e)
-        this.error = e.response ? e.response.data : 'Error loading profile'
-        this.photos = []
+        console.error('Profile load error:', e);
+        const errMsg = e?.response?.data ?? e?.message ?? "";
+        this.error = String(errMsg).trim();
+        this.photos = [];
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
@@ -186,12 +187,6 @@ export default {
       next()
     },
 
-    // updateFollowState(newFollowState, followerChange) {
-    //   this.profile.isFollowed = newFollowState;
-    //   this.profile.followerCount += followerChange;
-    //   this.loadProfileData();
-    // },
-
     async followUser() {
       try {
         const userId = this.$route.params.userId
@@ -222,7 +217,8 @@ export default {
 <template>
   <div class="profile-container">
     <div class="profile-view">
-      <ErrorMsg v-if="error" :msg="error"/>
+      <!-- Mostra l'errore solo se non è in caricamento -->
+      <ErrorMsg v-if="!loading && error" :msg="error"/>
       <LoadingSpinner :loading="loading">
         <div v-if="profile" class="profile-content">
           <!-- Profile Header -->

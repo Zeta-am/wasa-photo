@@ -13,7 +13,6 @@ export default {
 
 <template>
   <div class="result-item" @click="$emit('select', user)">
-    <img :src="user.avatar || 'default-avatar.png'" class="avatar" alt="Profile picture">
     <div class="user-info">
       <div class="username">{{ user.username }}</div>
     </div>

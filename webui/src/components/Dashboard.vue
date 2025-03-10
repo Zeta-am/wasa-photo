@@ -6,12 +6,16 @@ export default {
   name: 'Dashboard',
   props: {
     username: String,
-    usrLink: String,
     logo: String
   },
   components: {
     UploadPhotoModal,
     SearchModal
+  },
+  computed: {
+    usrLink() {
+      return `/users/${this.$utils.getCurrentId()}`
+    }
   },
   methods: {
     openUploadModal() {

@@ -28,12 +28,11 @@ export default {
   methods: {
     async loadLikes() {
       try {
-        // Richiama l'API che ora restituisce tutti i like del post
         const response = await this.$axios.get(`/users/${this.$utils.getCurrentId()}/posts/${this.post.id}/likes`);
-        
-        this.likeCount = response.data.length;
-        // Usa "==" per evitare problemi di tipizzazione
-        this.isLiked = response.data.some(like => like.userId == this.$utils.getCurrentId());
+        // Forza response.data a essere un array vuoto se null
+        const likes = response.data || [];
+        this.likeCount = likes.length;
+        this.isLiked = likes.some(like => like.userId == this.$utils.getCurrentId());
       } catch (e) {
         console.error('Error fetching likes:', e);
       }
@@ -85,11 +84,11 @@ export default {
         </svg>
       </button>
       <div class="post-stats">
-        <div class="likes-count">{{ likeCount }} {{ likeCount === 1 ? 'like' : 'likes' }} </div>
+        <div v-if="likeCount > 0" class="likes-count">{{ likeCount }} {{ likeCount === 1 ? 'like' : 'likes' }} </div>
         <div class="post-caption">
           <strong>{{ post.username }}</strong> {{ post.caption }}
         </div>
-        <div class="post-comments" @click="openModal" style="cursor: pointer;">
+        <div v-if="commentCount > 0" class="post-comments" @click="openModal" style="cursor: pointer;">
           <span class="gray-text">{{ commentCount }} comments</span>
         </div>
       </div>

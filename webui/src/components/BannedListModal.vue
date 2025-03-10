@@ -20,7 +20,6 @@
         <div v-else class="banned-list">
           <div v-for="user in users" :key="user.id" class="banned-item">
             <div class="user-info">
-              <img :src="user.profileImage || 'default-avatar.png'" class="avatar" alt="Profile picture">
               <span class="username">{{ user.username }}</span>
             </div>
             <button 
