@@ -52,14 +52,11 @@ export default {
   methods: {
     async loadProfileData() {
       this.loading = true;
-      // Resetta i dati prima di caricare il nuovo profilo
       this.error = "";
       this.profile = null;
       try {
         const userId = this.$route.params.userId;
-        if (!userId || this.$route.name === 'home') {
-          return;
-        }
+        if (!userId || this.$route.name === 'home') return;
     
         const [profileResponse, photosResponse] = await Promise.all([
           this.$axios.get(`/users/${userId}`),
@@ -74,8 +71,10 @@ export default {
         this.isOwnProfile = userId === this.$utils.getCurrentId().toString();
       } catch (e) {
         console.error('Profile load error:', e);
-        const errMsg = e?.response?.data ?? e?.message ?? "";
-        this.error = String(errMsg).trim();
+        // Se e.response non esiste, non mostrare alcun errore (evita flash indesiderati)
+        this.error = e && e.response
+          ? String(e.response.data?.message || e.response.data || e.message || "Error loading profile").trim()
+          : "";
         this.photos = [];
       } finally {
         this.loading = false;

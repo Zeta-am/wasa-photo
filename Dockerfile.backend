@@ -1,0 +1,25 @@
+# Start from a temporary go image
+FROM golang:1.19.1 AS builder
+
+# Copy the go source code in builder
+WORKDIR /src/
+COPY . .
+
+# Build the executable in builder
+RUN go build -o /app/webapi ./cmd/webapi
+
+# Create final container
+FROM debian:bullseye
+
+# Expose the port
+EXPOSE 3000 4000
+
+# Create a directory for the storage
+RUN mkdir -p /app/storage
+
+# Copy the executable from builder to final container
+WORKDIR /app/
+COPY --from=builder /app/webapi ./
+
+# Run the executable
+CMD ["/app/webapi"]
