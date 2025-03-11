@@ -68,7 +68,7 @@ export default {
   <div v-if="show" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
-        <h6>Cerca</h6>
+        <h6>Search</h6>
       </div>
 
       <div class="modal-body">
@@ -77,7 +77,7 @@ export default {
           <input 
             type="text" 
             class="form-control" 
-            placeholder="Cerca" 
+            placeholder="Search" 
             v-model="searchQuery"
             @input="handleInput"
           >
@@ -86,10 +86,10 @@ export default {
         <!-- Results -->
         <div class="results-container">
           <div v-if="loading" class="text-center p-3">
-            Caricamento...
+            Loading...
           </div>
           <div v-else-if="results.length === 0 && searchQuery" class="text-center p-3">
-            Nessun risultato trovato
+            No users found
           </div>
           <div v-else>
             <SearchResult 
@@ -103,7 +103,7 @@ export default {
       </div>
 
       <div class="modal-footer">
-        <button class="btn-cancel" @click="close">Chiudi</button>
+        <button class="btn-cancel" @click="close">Close</button>
       </div>
     </div>
   </div>

@@ -18,12 +18,12 @@
       <div v-if="posts.length === 0" class="row">
         <div class="mt-4 centered-content">
           <p class="text-muted">
-            Non ci sono post da visualizzare. 
+            There are no posts to view. 
           <br>
-            Questo può essere dovuto al fatto che non segui ancora nessuno o che le persone che segui non hanno ancora pubblicato contenuti.
+            This may be due to the fact that you don’t follow anyone yet or that the people you follow have not posted content yet.
           </p>
         <button @click="openSearch" class="btn btn-primary mt-3">
-          Cerca persone da seguire
+          Looking for people to follow
         </button>
       </div>
     
