@@ -71,7 +71,10 @@ export default {
 <template>
   <div class="post-card">
     <div class="post-header">
-      <span class="username">{{ post.username }}</span>
+      <!-- Usa post["user-id"] se l'oggetto post ha quella chiave -->
+      <span class="username clickable-username" @click.prevent="$router.push({ name: 'Profile', params: { userId: post['user-id'] } })">
+        {{ post.username }}
+      </span>
     </div>
     <img :src="'data:image/jpeg;base64,' + post.image" alt="Post image" @click="openModal">
     <div class="post-info">
@@ -85,7 +88,7 @@ export default {
       </button>
       <div class="post-stats">
         <div v-if="likeCount > 0" class="likes-count">{{ likeCount }} {{ likeCount === 1 ? 'like' : 'likes' }} </div>
-        <div class="post-caption">
+        <div v-if="post.caption != ''" class="post-caption">
           <strong>{{ post.username }}</strong> {{ post.caption }}
         </div>
         <div v-if="commentCount > 0" class="post-comments" @click="openModal" style="cursor: pointer;">
@@ -155,5 +158,12 @@ export default {
 
 .gray-text {
   color: gray;
+}
+
+/* Aggiungi uno stile specifico per clickable-username per renderlo simile ad un normale testo */
+.username.clickable-username {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
 }
 </style>

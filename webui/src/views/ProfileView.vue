@@ -247,14 +247,6 @@ export default {
               <ul class="list-group">
                 <li v-for="user in userList" :key="user.id" class="list-group-item d-flex justify-content-between align-items-center">
                   {{ user.username }}
-                  <button 
-                    v-if="isOwnProfile && !user.banned" 
-                    @click="toggleBan(user)"
-                    class="btn btn-sm"
-                    :class="user.banned ? 'btn-success' : 'btn-danger'"
-                  >
-                    {{ user.banned ? 'Unban' : 'Ban' }}
-                  </button>
                 </li>
               </ul>
               <button @click="closeList" class="btn btn-secondary mt-3">Close</button>

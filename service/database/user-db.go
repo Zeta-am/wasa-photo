@@ -223,18 +223,22 @@ func (db *appdbimpl) GetUserPhotos(uid int) ([]utils.Post, int, error) {
 }
 
 func (db *appdbimpl) GetUsersByPattern(pattern string, currentUserId int) ([]utils.User, int, error) {
-
 	rows, err := db.c.Query(`
         SELECT DISTINCT u.user_id, u.username
         FROM users u
         WHERE u.username LIKE ? 
-        AND u.user_id != ?  
-        AND u.user_id NOT IN (
-            SELECT b.banned_id 
-            FROM bans b 
-            WHERE b.user_id = ?
-        )
-    `, "%"+pattern+"%", currentUserId, currentUserId)
+          AND u.user_id != ?  
+          AND u.user_id NOT IN (
+              SELECT b.banned_id 
+              FROM bans b 
+              WHERE b.user_id = ?
+          )
+          AND u.user_id NOT IN (
+              SELECT b.user_id
+              FROM bans b
+              WHERE b.banned_id = ?
+          )
+    `, "%"+pattern+"%", currentUserId, currentUserId, currentUserId)
 
 	if err != nil {
 		return nil, ERROR, err
@@ -253,8 +257,6 @@ func (db *appdbimpl) GetUsersByPattern(pattern string, currentUserId int) ([]uti
 		if err != nil {
 			return nil, ERROR, err
 		}
-		// Debug log
-
 		users = append(users, user)
 	}
 

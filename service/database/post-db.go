@@ -21,21 +21,27 @@ func (db *appdbimpl) DeletePost(pid int) (int, error) {
 	// Elimina prima i commenti collegati
 	_, err = tx.Exec(`DELETE FROM comments WHERE post_id = ?`, pid)
 	if err != nil {
-		tx.Rollback()
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			err = rollbackErr
+		}
 		return ERROR, err
 	}
 
 	// Elimina i like collegati
 	_, err = tx.Exec(`DELETE FROM likes WHERE post_id = ?`, pid)
 	if err != nil {
-		tx.Rollback()
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			err = rollbackErr		
+		}
 		return ERROR, err
 	}
 
 	// Elimina il post
 	_, err = tx.Exec(`DELETE FROM posts WHERE post_id = ?`, pid)
 	if err != nil {
-		tx.Rollback()
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			err = rollbackErr
+		}
 		return ERROR, err
 	}
 
