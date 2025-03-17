@@ -520,6 +520,40 @@ paths:
     parameters:
       - $ref: "#/components/parameters/idUser"
       - $ref: "#/components/parameters/idPhoto"
+    get:
+      summary: Get likes
+      description: Get the list of likes put by the user
+      tags: ["likes"]
+      operationId: getLikes
+      responses:
+        "200":
+          description: Likes returned
+          content:
+            application/json:
+              schema:
+                description: The list of likes
+                type: object
+                properties:
+                  likes:
+                    description: The list of likes put by the user
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/User"
+                    minItems: 0
+                    maxItems: 50
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401": 
+          $ref: '#/components/responses/Unauthorized'
+        "404": 
+          $ref: "#/components/responses/NotFound" 
+        "500":
+          $ref: "#/components/responses/InternalServerError" 
+  /users/{idUser}/posts/{idPhoto}/likes/{idLike}:
+    parameters:
+      - $ref: "#/components/parameters/idUser"
+      - $ref: "#/components/parameters/idPhoto"
+      - $ref: "#/components/parameters/idLike"
     put:
       summary: Like a photo
       description: The user put a like on a photo
@@ -548,35 +582,6 @@ paths:
           $ref: "#/components/responses/No content"
         "400": 
           $ref: "#/components/responses/BadRequest" 
-        "401": 
-          $ref: '#/components/responses/Unauthorized'
-        "404": 
-          $ref: "#/components/responses/NotFound" 
-        "500":
-          $ref: "#/components/responses/InternalServerError" 
-    get:
-      summary: Get likes
-      description: Get the list of likes put by the user
-      tags: ["likes"]
-      operationId: getLikes
-      responses:
-        "200":
-          description: Likes returned
-          content:
-            application/json:
-              schema:
-                description: The list of likes
-                type: object
-                properties:
-                  likes:
-                    description: The list of likes put by the user
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/User"
-                    minItems: 0
-                    maxItems: 50
-        "400":
-          $ref: "#/components/responses/BadRequest"
         "401": 
           $ref: '#/components/responses/Unauthorized'
         "404": 
@@ -755,6 +760,13 @@ components:
       required: true
       schema:  
         $ref: "#/components/schemas/User/properties/id" 
+    idLike:
+      name: idLike
+      in: path
+      description: The id of a like
+      required: true
+      schema: 
+        $ref: "#/components/schemas/User/properties/id"
 
   responses:
     OK: # 200

@@ -31,7 +31,7 @@ func (db *appdbimpl) DeletePost(pid int) (int, error) {
 	_, err = tx.Exec(`DELETE FROM likes WHERE post_id = ?`, pid)
 	if err != nil {
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
-			err = rollbackErr		
+			err = rollbackErr
 		}
 		return ERROR, err
 	}

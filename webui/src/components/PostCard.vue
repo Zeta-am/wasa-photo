@@ -41,11 +41,12 @@ export default {
       try {
         const userId = this.$utils.getCurrentId();
         if (!this.isLiked) {
-          await this.$axios.put(`/users/${userId}/posts/${this.post.id}/likes`);
+          // Per il like (PUT) non è necessario un idLike; la rotta ignora eventuali valori extra
+          await this.$axios.put(`/users/${userId}/posts/${this.post.id}/likes/0`);
         } else {
-          await this.$axios.delete(`/users/${userId}/posts/${this.post.id}/likes`);
+          // Per il unlike (DELETE), passa un valore fittizio, ad es. "0"
+          await this.$axios.delete(`/users/${userId}/posts/${this.post.id}/likes/0`);
         }
-        // Aggiorna il conteggio dei like dopo il toggle
         await this.loadLikes();
       } catch (e) {
         this.error = 'Error updating like';

@@ -73,15 +73,14 @@ export default {
       try {
         const userId = this.$utils.getCurrentId();
         if (!this.isLiked) {
-          await this.$axios.put(`/users/${userId}/posts/${this.photo.id}/likes`);
+          await this.$axios.put(`/users/${userId}/posts/${this.photo.id}/likes/0`);
           this.likeCount++;
           this.isLiked = true;
         } else {
-          await this.$axios.delete(`/users/${userId}/posts/${this.photo.id}/likes`);
+          await this.$axios.delete(`/users/${userId}/posts/${this.photo.id}/likes/0`);
           this.likeCount--;
           this.isLiked = false;
         }
-        // Emetti l'evento per il nuovo stato dei like
         this.$emit('like-updated', { likeCount: this.likeCount, isLiked: this.isLiked });
       } catch (e) {
         this.error = 'Error updating like';
