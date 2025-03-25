@@ -3,7 +3,6 @@ import UserInfo from '@/components/UserInfo.vue'
 import PhotoGrid from '@/components/PhotoGrid.vue'
 import ChangeUsernameModal from '@/components/ChangeUsernameModal.vue'
 import BannedListModal from '@/components/BannedListModal.vue'
-import Dashboard from '@/components/Dashboard.vue'
 
 export default {
   name: 'ProfileView',
@@ -11,8 +10,7 @@ export default {
     UserInfo,
     PhotoGrid,
     ChangeUsernameModal,
-    BannedListModal,
-    Dashboard
+    BannedListModal
   },
   data() {
     return {
