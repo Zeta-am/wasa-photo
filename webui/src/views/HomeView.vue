@@ -34,13 +34,11 @@
 
 <script>
 import SearchModal from '@/components/SearchModal.vue'
-import Dashboard from '@/components/Dashboard.vue'
 import PostCard from '@/components/PostCard.vue'
 
 export default {
   components: {
     SearchModal,
-    Dashboard,
     PostCard
   },
   data() {
