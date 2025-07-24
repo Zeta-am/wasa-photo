@@ -1,10 +1,25 @@
-# Fantastic coffee (decaffeinated)
+# WASAPhoto
 
-This repository contains the basic structure for [Web and Software Architecture](http://gamificationlab.uniroma1.it/en/wasa/) homework project.
-It has been described in class.
+**A full-stack project in Go and Vue.js**
 
-"Fantastic coffee (decaffeinated)" is a simplified version for the WASA course, not suitable for a production environment.
-The full version can be found in the "Fantastic Coffee" repository.
+![YAML](https://img.shields.io/badge/YAML-85EA2D?style=for-the-badge&logo=YAML&logoColor=white)
+![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
+![Vue.js](https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D)
+![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
+
+WASAPhoto is a social network where users can post photos, leave likes, comments and
+also ban other users, with all the implications about information hiding.
+
+It consists of:
+
+* Documented REST API (OpenAPI 3.0) with all the endpoints described.
+  You can find the specification [here](doc/api.yaml)
+* Golang backend which implements the REST API. According to the given project
+  specification, an authentication mechanism is not provided. Instead,
+  the User ID is sent as an Authorization Bearer header, as it was a token in some way.
+* Vue.js frontend app, which of course interfaces with the implemented REST API.
+* All distributed using a Docker image
 
 ## Project structure
 
@@ -26,30 +41,6 @@ The full version can be found in the "Fantastic Coffee" repository.
 Other project files include:
 * `open-npm.sh` starts a new (temporary) container using `node:lts` image for safe web frontend development (you don't want to use `npm` in your system, do you?)
 
-## Go vendoring
-
-This project uses [Go Vendoring](https://go.dev/ref/mod#vendoring). You must use `go mod vendor` after changing some dependency (`go get` or `go mod tidy`) and add all files under `vendor/` directory in your commit.
-
-For more information about vendoring:
-
-* https://go.dev/ref/mod#vendoring
-* https://www.ardanlabs.com/blog/2020/04/modules-06-vendoring.html
-
-## Node/NPM vendoring
-
-This repository contains the `webui/node_modules` directory with all dependencies for Vue.JS. You should commit the content of that directory and both `package.json` and `package-lock.json`.
-
-## How to set up a new project from this template
-
-You need to:
-
-* Change the Go module path to your module path in `go.mod`, `go.sum`, and in `*.go` files around the project
-* Rewrite the API documentation `doc/api.yaml`
-* If no web frontend is expected, remove `webui` and `cmd/webapi/register-webui.go`
-* If no cronjobs or health checks are needed, remove them from `cmd/`
-* Update top/package comment inside `cmd/webapi/main.go` to reflect the actual project usage, goal, and general info
-* Update the code in `run()` function (`cmd/webapi/main.go`) to connect to databases or external resources
-* Write API code inside `service/api`, and create any further package inside `service/` (or subdirectories)
 
 ## How to build
 
@@ -86,33 +77,20 @@ If you want to launch the WebUI, open a new tab and launch:
 npm run dev
 ```
 
-## Known issues
+## How to run (Docker)
 
-### Apple M1 / ARM: `failed to load config from`...
-
-If you use Apple M1/M2 hardware, or other ARM CPUs, you may encounter an error message saying that `esbuild` (or some other tool) has been built for another platform.
-
-If so, you can fix issuing these commands **only the first time**:
+**Backend**
 
 ```shell
-./open-npm.sh
-# (here you're inside the NPM container)
-npm install
-exit
-# Now you can continue as indicated in "How to build/run"
+docker build -f Dockerfile.backend -t backend:latest .
+docker run -it --rm -p 3000:3000 backend:latest
 ```
 
-**Use these instructions only if you get an error. Do not use it if your build is OK**.
-
-### My build works when I use `npm run dev`, however there is a Javascript crash in production/grading
-
-Some errors in the code are somehow not shown in `vite` development mode. To preview the code that will be used in production/grading settings, use the following commands:
+**Frontend**
 
 ```shell
-./open-npm.sh
-# (here you're inside the NPM container)
-npm run build-prod
-npm run preview
+docker build -f Dockerfile.frontend -t frontend:latest .
+docker run -it --rm -p 8080:80 frontend:latest
 ```
 
 ## License
